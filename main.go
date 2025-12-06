@@ -12,6 +12,7 @@ func main() {
 			Status string `json:"status"`
 		}{Status: "OK"}
 
+		w.Header().Add("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	})
 	_ = http.ListenAndServe(":8000", nil)
