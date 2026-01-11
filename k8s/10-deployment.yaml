@@ -2,7 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: api
-  namespace: s-shop-api
+  namespace: s-shop-system
   labels:
     app: api
 spec:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: romasmi/s-shop-system
+          image: romasmi/s-shop-system:latest
           ports:
             - name: web
               containerPort: 8000

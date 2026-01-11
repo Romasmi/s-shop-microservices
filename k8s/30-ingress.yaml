@@ -2,9 +2,9 @@ kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
   name: ingress
-  namespace: traefik
+  namespace: s-shop-system
   annotations:
-    kubernetes.io/ingress.class: "traefik"
+    kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
     - host: "arch.homework"
@@ -15,5 +15,5 @@ spec:
               service:
                 name: api
                 port:
-                  number: 80
+                  number: 8000
             pathType: Prefix
