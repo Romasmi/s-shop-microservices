@@ -1,6 +1,6 @@
 .PHONY: deploy install-ingress apply-manifests setup-hosts tunnel clean help
 
-deploy: install-ingress apply-manifests setup-hosts
+deploy: install-ingress apply hosts
 	@echo "Completed"
 	@echo "Run 'make tunnel' in a separate terminal to start minikube tunnel"
 	@echo "Open: http://arch.homework:8080/health"
