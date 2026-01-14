@@ -18,9 +18,17 @@ spec:
       containers:
         - name: app
           image: romasmi/s-shop-system:latest
+          imagePullPolicy: Always
           ports:
             - name: web
               containerPort: 8000
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 100m
+            limits:
+              memory: 128Mi
+              cpu: 200m
           livenessProbe:
             httpGet:
               path: /health
