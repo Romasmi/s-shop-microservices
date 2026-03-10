@@ -1,0 +1,10 @@
+fullnameOverride: postgresql
+auth:
+  username: user
+  password: password
+  database: social_network
+primary:
+  persistence:
+    enabled: false
+  service:
+    type: LoadBalancer
