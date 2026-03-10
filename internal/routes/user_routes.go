@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/Romasmi/s-shop-microservices/internal/handlers/http/user_handler"
-	"github.com/Romasmi/s-shop-microservices/internal/middleware"
 	"github.com/Romasmi/s-shop-microservices/internal/repository"
 	"github.com/Romasmi/s-shop-microservices/internal/services"
 	"github.com/gorilla/mux"
@@ -12,21 +11,12 @@ import (
 )
 
 func RegisterUserRoutes(r *mux.Router, db *pgxpool.Pool) {
+	userRepo := repository.CreateUserRepository(db)
+	userService := services.CreateUserService(userRepo)
+	userHandler := user_handler.NewUserHandler(userService)
 
-	userService := services.CreateUserService(cityRepo, profileRepo, profileFriendsRepo, uow, publisher)
-	sessionService := services.CreateSessionService(sessionRepo)
-
-	userHandler := user_handler.CreateUserHandler(userService)
-
-	r.HandleFunc("/user/register", userHandler.RegisterUserHandler).Methods(http.MethodPost)
-
-	privateRoute := r.PathPrefix("/").Subrouter()
-
-	authMiddleware := middleware.CreateAuthMiddleware(sessionService)
-
-	privateRoute.Use(authMiddleware.Process)
-	privateRoute.HandleFunc("/user/get/{userId}", userHandler.GetUserHandler).Methods(http.MethodGet)
-	privateRoute.HandleFunc("/user/search", userHandler.SearchUserHandler).Methods(http.MethodGet)
-	privateRoute.HandleFunc("/friend/set/{userId}", userHandler.SetFriend).Methods(http.MethodPut)
-	privateRoute.HandleFunc("/friend/delete/{userId}", userHandler.DeleteFriend).Methods(http.MethodPut)
+	r.HandleFunc("/user", userHandler.CreateUserHandler).Methods(http.MethodPost)
+	r.HandleFunc("/user/{userId}", userHandler.GetUserHandler).Methods(http.MethodGet)
+	r.HandleFunc("/user/{userId}", userHandler.UpdateUserHandler).Methods(http.MethodPut)
+	r.HandleFunc("/user/{userId}", userHandler.DeleteUserHandler).Methods(http.MethodDelete)
 }

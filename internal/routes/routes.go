@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Romasmi/s-shop-microservices/internal/events/publisher"
 	"github.com/Romasmi/s-shop-microservices/internal/infra/database"
 	"github.com/Romasmi/s-shop-microservices/internal/infra/redis_client"
 	"github.com/Romasmi/s-shop-microservices/internal/middleware"
