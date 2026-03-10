@@ -1,11 +1,11 @@
 .PHONY: deploy install-ingress apply-manifests setup-hosts tunnel clean help
 
-deploy: install-ingress install-db apply hosts
+deploy: install-ingress install-db apply hosts wait-db
 	@echo "Completed"
 	@echo "Run 'make tunnel' in a separate terminal to start minikube tunnel"
 	@echo "Open: http://arch.homework:8080/health"
 
-up: deploy migration-up
+up: deploy wait-api
 
 install-ingress:
 	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/ || true
@@ -38,9 +38,20 @@ run:
 
 migration-up:
 	@echo "Running migrations..."
-	@sleep 10
+	@echo "Note: This requires a tunnel or port-forward to localhost:5432"
+	docker run --rm -v $(PWD)/migrations:/migrations --add-host=host.docker.internal:host-gateway migrate/migrate \
+		-path=/migrations/ -database "postgres://user:password@host.docker.internal:5432/social_network?sslmode=disable" up || \
 	docker run --rm -v $(PWD)/migrations:/migrations --network host migrate/migrate \
 		-path=/migrations/ -database "postgres://user:password@localhost:5432/social_network?sslmode=disable" up
+
+wait-db:
+	@echo "Waiting for PostgreSQL to be ready..."
+	@sleep 5
+	kubectl wait --namespace s-shop-system --for=condition=ready pod -l app.kubernetes.io/name=postgresql --timeout=120s
+
+wait-api:
+	@echo "Waiting for API deployment to be ready..."
+	kubectl rollout status deployment/api -n s-shop-system --timeout=120s
 
 clean:
 	kubectl delete -f ./k8s --ignore-not-found=true

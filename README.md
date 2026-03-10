@@ -13,8 +13,8 @@ To start the API locally using Minikube:
     ```shell
     make up
     ```
-    This command installs the Ingress controller, PostgreSQL database via Helm, applies application manifests, configures `/etc/hosts`, and runs migrations.
-    *Note: The tunnel must be running for migrations to succeed.*
+    This command installs the Ingress controller, PostgreSQL database via Helm, applies application manifests, configures `/etc/hosts`, and waits for the API to be ready (it runs migrations automatically on startup).
+    *Note: The tunnel must be running to access the API via hostnames.*
 
 3.  **Access the API**:
     The API is available at `http://arch.homework:8080`.

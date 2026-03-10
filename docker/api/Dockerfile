@@ -15,6 +15,7 @@ WORKDIR /app
 RUN chown -R appuser:appgroup /app
 
 COPY --from=builder --chown=appuser:appgroup /app/main .
+COPY --from=builder --chown=appuser:appgroup /app/migrations ./migrations
 USER appuser
 
 EXPOSE 8000
