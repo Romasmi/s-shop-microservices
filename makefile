@@ -1,14 +1,19 @@
-.PHONY: deploy install-ingress apply-manifests setup-hosts tunnel clean help
+.PHONY: up build deploy restart install-ingress install-db apply hosts run migration-up wait-db wait-api clean redeploy status help
+
+up: build deploy restart wait-api
+
+build:
+	docker build --platform linux/amd64 -t romasmi/s-shop-system:latest -f docker/api/Dockerfile .
+	@if minikube status >/dev/null 2>&1; then \
+		echo "Loading image into minikube..."; \
+		minikube image load romasmi/s-shop-system:latest; \
+	fi
 
 deploy: install-ingress install-db apply hosts wait-db
 	@echo "Completed"
 	@echo "Run 'make tunnel' in a separate terminal to start minikube tunnel"
 	@echo "Open: http://arch.homework:8080/health"
 
-up: build deploy restart wait-api
-
-build:
-	docker build --platform linux/amd64 -t romasmi/s-shop-system:latest -f docker/api/Dockerfile .
 
 restart:
 	@echo "Restarting API deployment..."
@@ -60,6 +65,9 @@ wait-api:
 	@echo "Waiting for API deployment to be ready..."
 	kubectl rollout status deployment/api -n s-shop-system --timeout=120s
 
+
+redeploy: clean deploy
+
 clean:
 	kubectl delete -f ./k8s --ignore-not-found=true
 	helm uninstall nginx-ingress -n ingress-nginx --ignore-not-found
@@ -67,8 +75,6 @@ clean:
 	kubectl delete namespace ingress-nginx --ignore-not-found=true
 	kubectl delete namespace s-shop-system --ignore-not-found=true
 	@echo "Note: /etc/hosts entry must be removed manually"
-
-redeploy: clean deploy
 
 status:
 	@echo "\n Ingress Controller:"
