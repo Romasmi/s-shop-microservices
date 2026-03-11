@@ -31,7 +31,7 @@ func RegisterRoutes(
 	router.MethodNotAllowedHandler = http.HandlerFunc(MethodNotAllowedHandler)
 
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		http_utils.SuccessJsonResponse(w, map[string]string{"status": "OK!!!"})
+		http_utils.SuccessJsonResponse(w, map[string]string{"status": "OK"})
 	}).Methods(http.MethodGet)
 
 	RegisterUserRoutes(router, app.GetDB().DB)
