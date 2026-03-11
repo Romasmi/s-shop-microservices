@@ -35,6 +35,10 @@ func (h *UserHandler) UpdateUserHandler(w http.ResponseWriter, r *http.Request) 
 			http_utils.JsonErrorNotFound(w)
 			return
 		}
+		if errors.Is(err, repository.ErrDuplicate) {
+			http_utils.JsonError(w, http.StatusBadRequest, fmt.Errorf("user already exists"))
+			return
+		}
 
 		fmt.Printf("error while user update: %v\n", err)
 		http_utils.JsonInternalServerError(w)
