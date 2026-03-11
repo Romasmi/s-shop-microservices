@@ -13,7 +13,7 @@ To start the API locally using Minikube:
     ```shell
     make up
     ```
-    This command installs the Ingress controller, PostgreSQL database via Helm, applies application manifests, configures `/etc/hosts`, and waits for the API to be ready (it runs migrations automatically on startup).
+    This command builds the Docker image, installs the Ingress controller, PostgreSQL database via Helm, applies application manifests, configures `/etc/hosts`, and waits for the API to be ready (it runs migrations automatically on startup).
     *Note: The tunnel must be running to access the API via hostnames.*
 
 3.  **Access the API**:
@@ -21,7 +21,15 @@ To start the API locally using Minikube:
 
     Example:
     ```shell
-    curl http://arch.homework:8080/user
+    curl -X POST http://arch.homework:8080/user \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+      "username": "johndoe",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@doe.com",
+      "phone": "+71002003040"
+    }'
     ```
 
 ## Development
@@ -34,7 +42,11 @@ make migration-up
 
 ### Build Docker Image
 ```shell
-docker build --platform linux/amd64 -t s-shop-system:latest .
+make build
+```
+Or manually:
+```shell
+docker build --platform linux/amd64 -t romasmi/s-shop-system:latest -f docker/api/Dockerfile .
 ```
 
 https://hub.docker.com/r/romasmi/s-shop-system

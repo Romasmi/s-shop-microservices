@@ -1,9 +1,9 @@
 FROM golang:1.25.1-alpine AS builder
 WORKDIR /app
-COPY ../../go.mod ./
+COPY go.mod go.sum ./
 RUN go mod download
-COPY ../.. .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main .
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main ./cmd/api
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
@@ -16,6 +16,7 @@ RUN chown -R appuser:appgroup /app
 
 COPY --from=builder --chown=appuser:appgroup /app/main .
 COPY --from=builder --chown=appuser:appgroup /app/migrations ./migrations
+COPY --from=builder --chown=appuser:appgroup /app/config.yaml .
 USER appuser
 
 EXPOSE 8000

@@ -7,24 +7,16 @@ import (
 
 	"github.com/Romasmi/s-shop-microservices/internal/config"
 	"github.com/Romasmi/s-shop-microservices/internal/infra/database"
-	"github.com/Romasmi/s-shop-microservices/internal/infra/kafka_client"
-	"github.com/Romasmi/s-shop-microservices/internal/infra/redis_client"
 )
 
 type App struct {
-	DbConn          *database.Connection
-	RedisConn       *redis_client.Connection
-	KafkaConnection *kafka_client.Connection
-	Config          *config.Config
-	server          *http.Server
+	DbConn *database.Connection
+	Config *config.Config
+	server *http.Server
 }
 
 func (a *App) GetDB() *database.Connection {
 	return a.DbConn
-}
-
-func (a *App) GetRedis() *redis_client.Connection {
-	return a.RedisConn
 }
 
 func NewApp(configPath string) (*App, error) {
@@ -44,16 +36,6 @@ func (a *App) init(configPath string) error {
 		return fmt.Errorf("error connecting to DB: %v\n", err)
 	}
 	a.DbConn = dbConn
-
-	redisConn := &redis_client.Connection{Config: &envConfig.Redis}
-	redisConn.Connect()
-	a.RedisConn = redisConn
-
-	kafkaConn, err := kafka_client.CreateKafkaConnection(&a.Config.Kafka)
-	if err != nil {
-		return fmt.Errorf("error connecting to Kafka: %v\n", err)
-	}
-	a.KafkaConnection = kafkaConn
 
 	return nil
 }
@@ -78,8 +60,6 @@ func (a *App) Shutdown(ctx context.Context) error {
 			a.DbConn.DB.Close()
 		}
 	}
-
-	a.KafkaConnection.Close()
 
 	fmt.Println("Cleanup completed")
 	return shutdownErr

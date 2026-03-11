@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/Romasmi/s-shop-microservices/internal/infra/database"
-	"github.com/Romasmi/s-shop-microservices/internal/infra/redis_client"
 	"github.com/Romasmi/s-shop-microservices/internal/middleware"
 	"github.com/Romasmi/s-shop-microservices/internal/utils/http_utils"
 	"github.com/gorilla/mux"
@@ -13,7 +12,6 @@ import (
 
 type App interface {
 	GetDB() *database.Connection
-	GetRedis() *redis_client.Connection
 }
 
 type NotFoundResponse struct {
@@ -27,13 +25,22 @@ func RegisterRoutes(
 	if router == nil {
 		panic("router must be initialized before routes registration")
 	}
+	router.StrictSlash(true)
 	router.Use(middleware.ResponseHeadersMiddleware)
 	router.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
+	router.MethodNotAllowedHandler = http.HandlerFunc(MethodNotAllowedHandler)
+
+	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		http_utils.SuccessJsonResponse(w, map[string]string{"status": "OK!!!"})
+	}).Methods(http.MethodGet)
 
 	RegisterUserRoutes(router, app.GetDB().DB)
 }
 
 func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	http_utils.JsonError(w, http.StatusNotFound, fmt.Errorf("undefined route"))
+}
+
+func MethodNotAllowedHandler(w http.ResponseWriter, r *http.Request) {
+	http_utils.JsonError(w, http.StatusMethodNotAllowed, fmt.Errorf("method not allowed"))
 }

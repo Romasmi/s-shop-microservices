@@ -5,7 +5,14 @@ deploy: install-ingress install-db apply hosts wait-db
 	@echo "Run 'make tunnel' in a separate terminal to start minikube tunnel"
 	@echo "Open: http://arch.homework:8080/health"
 
-up: deploy wait-api
+up: build deploy restart wait-api
+
+build:
+	docker build --platform linux/amd64 -t romasmi/s-shop-system:latest -f docker/api/Dockerfile .
+
+restart:
+	@echo "Restarting API deployment..."
+	kubectl rollout restart deployment/api -n s-shop-system
 
 install-ingress:
 	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/ || true
@@ -74,8 +81,10 @@ status:
 	@kubectl get ingress -n s-shop-system
 
 help:
-	@echo "make up            - Deploy everything and run migrations"
+	@echo "make up            - Build image, deploy everything and run migrations"
 	@echo "make deploy         - Deploy ingress, database, and application"
+	@echo "make build          - Build Docker image locally"
+	@echo "make restart        - Force restart of the API deployment"
 	@echo "make migration-up   - Run database migrations"
 	@echo "make run         - Start minikube tunnel (separate terminal)"
 	@echo "make status         - Check deployment status"

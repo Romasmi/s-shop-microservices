@@ -16,7 +16,6 @@ func JsonResponse(w http.ResponseWriter, statusCode int, output interface{}) {
 	err := json.NewEncoder(w).Encode(output)
 	if err != nil {
 		fmt.Printf("error while encoding response: %v\n", err)
-		JsonError(w, http.StatusInternalServerError, fmt.Errorf("internal error"))
 	}
 }
 
@@ -29,8 +28,7 @@ func SuccessJsonResponse(w http.ResponseWriter, output interface{}) {
 }
 
 func JsonError(w http.ResponseWriter, statusCode int, err error) {
-	w.WriteHeader(statusCode)
-	_ = json.NewEncoder(w).Encode(&ErrorResponse{Error: err.Error()})
+	JsonResponse(w, statusCode, &ErrorResponse{Error: err.Error()})
 }
 
 func JsonErrorNotFound(w http.ResponseWriter) {
