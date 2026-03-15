@@ -105,31 +105,60 @@ kubectl get secret grafana \
   -o jsonpath="{.data.admin-password}" | base64 --decode
 ```
 
-## How to add Prometheus
-```shell
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-
-helm install prometheus prometheus-community/prometheus
-```
-
-### Expose prometheus
-
-```shell
-kubectl port-forward service/prometheus-server 9090:80
-```
-Open http://localhost:9090
-
-
 ## Monitoring and Metrics
 
 ### Application Metrics
-Get metrics endpoint `/metrics`.
+The API service exposes Prometheus metrics at `/metrics`. The `api` service in `k8s/20-service.yaml` is annotated for automatic discovery.
 
 Metrics:
 - **Latency**: `http_request_duration_seconds_bucket` (Histogram)
-- **RPS (Requests Per Second)**: Can be calculated with `rate(http_requests_total[1m])`
-- **Error Rate**: Can be calculated with `rate(http_requests_total{status=~"4..|5.."}[1m]) / rate(http_requests_total[1m])`
+- **RPS (Requests Per Second)**: `rate(http_requests_total[1m])`
+- **Error Rate**: `rate(http_requests_total{status=~"4..|5.."}[1m]) / rate(http_requests_total[1m])`
+
+### Prometheus Installation
+You can install Prometheus using the provided manifests or Helm.
+
+#### Using Manifests (Recommended)
+The Prometheus server is included in the `./k8s` directory and is deployed automatically with `make deploy`.
+It is configured to:
+- Scrape application metrics from pods/services with `prometheus.io/scrape: "true"` annotations.
+- Scrape Kubernetes node metrics (cAdvisor) to provide **CPU and Memory usage by pods**.
+
+To access Prometheus UI:
+```shell
+kubectl port-forward service/prometheus-service 9090:80 -n s-shop-system
+```
+Open http://localhost:9090
+
+#### Using Helm
+Alternatively, you can use Helm:
+```shell
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/prometheus
+```
+
+### Nginx Ingress Controller Metrics
+To enable Nginx Ingress metrics, we've updated `helm/nginx-ingress.yaml` with the following configuration:
+```yaml
+controller:
+  metrics:
+    enabled: true
+    service:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+```
+
+### Kubernetes Pod Metrics (CPU/Memory)
+Recommended Prometheus queries:
+- **CPU Usage by Pod**: `sum(rate(container_cpu_usage_seconds_total{container!="", pod!=""}[5m])) by (pod, namespace)`
+- **Memory Usage by Pod**: `sum(container_memory_working_set_bytes{container!="", pod!=""}) by (pod, namespace)`
+
+Make sure `metrics-server` is enabled if you are using Minikube:
+```shell
+minikube addons enable metrics-server
+```
 
 ## Load Testing
 
@@ -139,7 +168,7 @@ Install [k6](https://k6.io/) for load testing.
 
 To run the user API load test:
 ```shell
-k6 run --vus 1000 --duration 30s load_testing/users_test.js
+k6 run --vus 1000 --duration 30s load_testing/users.js
 ```
 
 Or specify a different base URL:

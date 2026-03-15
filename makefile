@@ -14,6 +14,7 @@ deploy: install-ingress install-db apply hosts wait-db
 	@echo "Run 'make tunnel' in a separate terminal to start minikube tunnel"
 	@echo "Open: http://arch.homework:8080/health"
 	@echo "Open: http://arch.homework:8080/metrics"
+	@echo "Prometheus: http://localhost:9090 (after port-forward)"
 
 
 restart:
