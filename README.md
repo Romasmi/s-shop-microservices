@@ -104,3 +104,13 @@ http://localhost:3000
 kubectl get secret grafana \
   -o jsonpath="{.data.admin-password}" | base64 --decode
 ```
+
+## Monitoring and Metrics
+
+### Application Metrics
+Get metrics endpoint `/metrics`.
+
+Metrics:
+- **Latency**: `http_request_duration_seconds_bucket` (Histogram)
+- **RPS (Requests Per Second)**: Can be calculated with `rate(http_requests_total[1m])`
+- **Error Rate**: Can be calculated with `rate(http_requests_total{status=~"4..|5.."}[1m]) / rate(http_requests_total[1m])`
