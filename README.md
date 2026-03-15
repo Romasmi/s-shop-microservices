@@ -88,3 +88,19 @@ Start tunnel on MacOS/Windows `minikube tunnel`
 curl http://arch.homework:8080/health
 curl http://arch.homework:8080/otusapp/romasmi/health
 ```
+
+## How to add Grafana
+```shell
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+helm install grafana grafana/grafana
+-- expose 
+kubectl port-forward service/grafana 3000:80
+-- open
+http://localhost:3000
+-- login admin/admin
+
+-- get password
+kubectl get secret grafana \
+  -o jsonpath="{.data.admin-password}" | base64 --decode
+```
