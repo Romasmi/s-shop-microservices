@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -24,7 +24,7 @@ func main() {
 
 	appInstance, err := app.NewApp(basePath)
 	if err != nil {
-		fmt.Printf("error while app init: %v", err)
+		slog.Error("error while app init", "error", err)
 		os.Exit(1)
 	}
 	api := app.NewApi(appInstance)
@@ -36,25 +36,25 @@ func main() {
 		appInstance.Config.Database.URL,
 	)
 	if m == nil || err != nil {
-		fmt.Printf("unable to create migrations driver: %v\n", err)
+		slog.Error("unable to create migrations driver", "error", err)
 		os.Exit(1)
 	}
 	defer func() {
 		if sourceErr, dbErr := m.Close(); sourceErr != nil || dbErr != nil {
-			fmt.Printf("Error closing migration driver - source: %v, db: %v\n", sourceErr, dbErr)
+			slog.Error("Error closing migration driver", "source_err", sourceErr, "db_err", dbErr)
 		}
 	}()
 
 	err = m.Up()
 
 	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		fmt.Printf("error while running up migrations: %v\n", err)
+		slog.Error("error while running up migrations", "error", err)
 		os.Exit(1)
 	}
 
 	go func() {
 		if err := api.Run(); err != nil {
-			fmt.Printf("server error: %v\n", err)
+			slog.Error("server error", "error", err)
 		}
 	}()
 
@@ -62,14 +62,14 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	fmt.Println("Shutting down gracefully...")
+	slog.Info("Shutting down gracefully...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := api.Shutdown(ctx); err != nil {
-		fmt.Printf("Error during shutdown: %v\n", err)
+		slog.Error("Error during shutdown", "error", err)
 	}
 
-	fmt.Println("Server stopped")
+	slog.Info("Server stopped")
 }

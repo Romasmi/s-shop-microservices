@@ -113,7 +113,29 @@ The API service exposes Prometheus metrics at `/metrics`. The `api` service in `
 Metrics:
 - **Latency**: `http_request_duration_seconds_bucket` (Histogram)
 - **RPS (Requests Per Second)**: `rate(http_requests_total[1m])`
-- **Error Rate**: `rate(http_requests_total{status=~"4..|5.."}[1m]) / rate(http_requests_total[1m])`
+- **Error Rate**: `rate(http_requests_total{status=~"5.."}[1m]) / rate(http_requests_total[1m])`
+
+### Grafana Dashboard
+A pre-configured Grafana dashboard is available in `grapahan/dashboard.json`.
+It includes:
+- **API Metrics**: Latency (p50, p95, p99), RPS, and Error Rate broken down by method and path.
+- **Ingress Metrics**: Global latency, RPS, and Error Rate from Nginx Ingress Controller.
+- **Kubernetes Metrics**: CPU and Memory usage for application pods.
+- **Database Metrics**: PostgreSQL connections, transactions, and database size.
+
+To use the dashboard:
+1.  Open Grafana UI (http://localhost:3000).
+2.  Go to **Dashboards** -> **New** -> **Import**.
+3.  Upload `grapahan/dashboard.json` or paste its content.
+
+### Alerting
+Recommended alert thresholds:
+- **Error Rate**: Alert if `sum(rate(http_requests_total{status=~"5.."}[2m])) / sum(rate(http_requests_total[2m])) > 0.05` (5%).
+- **Latency**: Alert if `histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[2m])) by (le)) > 1.0` (1 second).
+
+### Database Metrics
+PostgreSQL metrics are enabled via the Helm chart (`helm/postgresql-values.yaml`) which installs a Prometheus exporter.
+The metrics are automatically scraped by Prometheus from the `postgresql-metrics` service.
 
 ### Prometheus Installation
 You can install Prometheus using the provided manifests or Helm.
