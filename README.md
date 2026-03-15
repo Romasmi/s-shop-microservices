@@ -1,12 +1,52 @@
 # S-SHOP system implementation (microservice architecture)
-Readme will be updated later
 
-It will be implementation of system specified here:
-https://github.com/Romasmi/s-shop-decomposition-to-microservices
+## Quick Start
 
-## How to build docker image
+To start the API locally using Minikube:
+
+1.  **Start the tunnel** (in a separate terminal):
+    ```shell
+    make run
+    ```
+
+2.  **Start the environment**:
+    ```shell
+    make up
+    ```
+    This command builds the Docker image, installs the Ingress controller, PostgreSQL database via Helm, applies application manifests, configures `/etc/hosts`, and waits for the API to be ready (it runs migrations automatically on startup).
+    *Note: The tunnel must be running to access the API via hostnames.*
+
+3.  **Access the API**:
+    The API is available at `http://arch.homework:8080`.
+
+    Example:
+    ```shell
+    curl -X POST http://arch.homework:8080/user \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+      "username": "johndoe",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@doe.com",
+      "phone": "+71002003040"
+    }'
+    ```
+
+## Development
+
+### Database Migrations
+To run migrations manually:
 ```shell
-docker build --platform linux/amd64 -t s-shop-system:latest .
+make migration-up
+```
+
+### Build Docker Image
+```shell
+make build
+```
+Or manually:
+```shell
+docker build --platform linux/amd64 -t romasmi/s-shop-system:latest -f docker/api/Dockerfile .
 ```
 
 https://hub.docker.com/r/romasmi/s-shop-system

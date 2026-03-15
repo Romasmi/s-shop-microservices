@@ -1,11 +1,10 @@
-kind: Ingress
 apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: ingress
   namespace: s-shop-system
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
@@ -13,17 +12,17 @@ spec:
     - host: "arch.homework"
       http:
         paths:
-          - path: /otusapp/([^/]+)/?(.*)
+          - path: /otusapp/[^/]+/(.*)
             pathType: ImplementationSpecific
             backend:
               service:
                 name: api
                 port:
                   number: 8000
-          - path: /
+          - path: /(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: api
                 port:
                   number: 8000
-            pathType: Prefix

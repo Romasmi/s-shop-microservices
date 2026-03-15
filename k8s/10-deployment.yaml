@@ -19,6 +19,9 @@ spec:
         - name: app
           image: romasmi/s-shop-system:latest
           imagePullPolicy: Always
+          env:
+            - name: DATABASE_URL
+              value: "postgres://user:password@postgresql:5432/social_network?sslmode=disable"
           ports:
             - name: web
               containerPort: 8000
