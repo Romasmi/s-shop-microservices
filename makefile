@@ -1,4 +1,4 @@
-.PHONY: up build deploy restart install-ingress install-db apply hosts run migration-up wait-db wait-api clean redeploy status help
+.PHONY: up build deploy restart install-ingress install-db apply hosts run migration-up wait-db wait-api clean redeploy status help load-test
 
 up: build deploy restart wait-api
 
@@ -87,6 +87,10 @@ status:
 	@echo "\n Ingress:"
 	@kubectl get ingress -n s-shop-system
 
+load-test:
+	@echo "Running load tests with K6..."
+	k6 run --vus 1000 --duration 30s load_testing/users_test.js
+
 help:
 	@echo "make up            - Build image, deploy everything and run migrations"
 	@echo "make deploy         - Deploy ingress, database, and application"
@@ -94,6 +98,7 @@ help:
 	@echo "make restart        - Force restart of the API deployment"
 	@echo "make migration-up   - Run database migrations"
 	@echo "make run         - Start minikube tunnel (separate terminal)"
+	@echo "make load-test      - Run K6 load tests"
 	@echo "make status         - Check deployment status"
 	@echo "make clean          - Remove all resources"
 	@echo "make redeploy       - Clean and redeploy everything"

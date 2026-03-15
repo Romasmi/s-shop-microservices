@@ -105,6 +105,22 @@ kubectl get secret grafana \
   -o jsonpath="{.data.admin-password}" | base64 --decode
 ```
 
+## How to add Prometheus
+```shell
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm install prometheus prometheus-community/prometheus
+```
+
+### Expose prometheus
+
+```shell
+kubectl port-forward service/prometheus-server 9090:80
+```
+Open http://localhost:9090
+
+
 ## Monitoring and Metrics
 
 ### Application Metrics
@@ -114,3 +130,25 @@ Metrics:
 - **Latency**: `http_request_duration_seconds_bucket` (Histogram)
 - **RPS (Requests Per Second)**: Can be calculated with `rate(http_requests_total[1m])`
 - **Error Rate**: Can be calculated with `rate(http_requests_total{status=~"4..|5.."}[1m]) / rate(http_requests_total[1m])`
+
+## Load Testing
+
+Install [k6](https://k6.io/) for load testing.
+
+### Run tests
+
+To run the user API load test:
+```shell
+k6 run --vus 1000 --duration 30s load_testing/users_test.js
+```
+
+Or specify a different base URL:
+```shell
+k6 run --vus 1000 --duration 30s -e BASE_URL=http://arch.homework:8080 load_testing/users.js
+```
+
+The test covers:
+- Create user
+- Get user by ID
+- Update user
+- Delete user
