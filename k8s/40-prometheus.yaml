@@ -113,7 +113,10 @@ data:
             target_label: kubernetes_namespace
           - source_labels: [__meta_kubernetes_service_name]
             action: replace
-            target_label: kubernetes_name
+            target_label: service
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: pod
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -155,7 +158,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus-service
+  name: prometheus-server
   namespace: s-shop-system
 spec:
   selector:

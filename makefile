@@ -1,4 +1,4 @@
-.PHONY: up build deploy restart install-ingress install-db apply hosts run migration-up wait-db wait-api clean redeploy status help load-test
+.PHONY: up build deploy restart install-ingress install-db install-grafana apply hosts run migration-up wait-db wait-api clean redeploy status help load-test prometheus-run grafana-run context
 
 up: build deploy restart wait-api
 
@@ -9,17 +9,21 @@ build:
 		minikube image load romasmi/s-shop-system:latest; \
 	fi
 
-deploy: install-ingress install-db apply hosts wait-db
+deploy: install-ingress install-db install-grafana apply hosts wait-db
 	@echo "Completed"
 	@echo "Run 'make run' in a separate terminal to start minikube tunnel"
 	@echo "Open: http://arch.homework:8080/health"
 	@echo "Open: http://arch.homework:8080/metrics"
-	@echo "Prometheus: http://localhost:9090 (after port-forward)"
-	@echo "Grafana: http://localhost:3000 (after port-forward)"
+	@echo "Prometheus: http://localhost:9090 (run 'make prometheus-run' in a separate terminal)"
+	@echo "Grafana: http://localhost:3000 (run 'make grafana-run' in a separate terminal)"
 	@echo "Grafana password: make grafana-pass"
+	@echo "Hint: run 'make context' to set s-shop-system as your default namespace"
+
+context:
+	kubectl config set-context --current --namespace=s-shop-system
 
 grafana-pass:
-	@kubectl get secret grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo ""
+	@kubectl get secret grafana -o jsonpath="{.data.admin-password}" -n s-shop-system | base64 --decode ; echo ""
 
 
 restart:
@@ -28,19 +32,27 @@ restart:
 
 install-ingress:
 	helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/ || true
-	helm repo update
+	helm repo update ingress-nginx
 	helm upgrade --install nginx-ingress ingress-nginx/ingress-nginx \
 		--namespace ingress-nginx \
 		--create-namespace \
 		--values helm/nginx-ingress.yaml
 
 install-db:
-	helm repo add bitnami https://charts.bitnami.com/bitnami || true
-	helm repo update
+	helm repo add bitnami https://repo.broadcom.com/bitnami-files/ || true
+	helm repo update bitnami
 	helm upgrade --install postgresql bitnami/postgresql \
 		--namespace s-shop-system \
 		--create-namespace \
 		--values helm/postgresql-values.yaml
+
+install-grafana:
+	helm repo add grafana https://grafana.github.io/helm-charts || true
+	helm repo update grafana
+	helm upgrade --install grafana grafana/grafana \
+		--namespace s-shop-system \
+		--create-namespace \
+		--values helm/grafana-values.yaml
 
 apply:
 	kubectl apply -f ./k8s
@@ -54,6 +66,12 @@ hosts:
 
 run:
 	minikube tunnel
+
+prometheus-run:
+	kubectl port-forward service/prometheus-server 9090:80 -n s-shop-system
+
+grafana-run:
+	kubectl port-forward service/grafana 3000:80 -n s-shop-system
 
 migration-up:
 	@echo "Running migrations..."
@@ -79,6 +97,7 @@ clean:
 	kubectl delete -f ./k8s --ignore-not-found=true
 	helm uninstall nginx-ingress -n ingress-nginx --ignore-not-found
 	helm uninstall postgresql -n s-shop-system --ignore-not-found
+	helm uninstall grafana -n s-shop-system --ignore-not-found
 	kubectl delete namespace ingress-nginx --ignore-not-found=true
 	kubectl delete namespace s-shop-system --ignore-not-found=true
 	@echo "Note: /etc/hosts entry must be removed manually"
@@ -88,14 +107,16 @@ status:
 	@kubectl get pods -n ingress-nginx
 	@echo "\n Application:"
 	@kubectl get pods -n s-shop-system
-	@echo "\n Services:"
+	@echo "\n Services (s-shop-system):"
+	@kubectl get svc -n s-shop-system
+	@echo "\n Services (ingress-nginx):"
 	@kubectl get svc -n ingress-nginx
 	@echo "\n Ingress:"
 	@kubectl get ingress -n s-shop-system
 
 load-test:
 	@echo "Running load tests with K6..."
-	k6 run --vus 1000 --duration 30s load_testing/users_test.js
+	k6 run --vus 1000 --duration 30s load_testing/users.js
 
 help:
 	@echo "make up            - Build image, deploy everything and run migrations"

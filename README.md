@@ -59,7 +59,7 @@ Run make command `make deploy` or install manually
 
 ```shell
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/ && \
-helm repo update && \
+helm repo update ingress-nginx && \
 helm install nginx-ingress ingress-nginx/ingress-nginx \
   --namespace ingress-nginx \
   --create-namespace \
@@ -90,22 +90,31 @@ curl http://arch.homework:8080/otusapp/romasmi/health
 ```
 
 ## How to add Grafana
-```shell
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update
-helm install grafana grafana/grafana
--- expose 
-kubectl port-forward service/grafana 3000:80
--- open
-http://localhost:3000
--- login admin/admin
 
--- get password
-kubectl get secret grafana \
-  -o jsonpath="{.data.admin-password}" | base64 --decode
-```
+Grafana is configured to automatically take data from Prometheus and load the API dashboard.
 
-## Monitoring and Metrics
+1.  **Install Grafana** using Helm:
+    ```shell
+    make install-grafana
+    ```
+    This uses `helm/grafana-values.yaml` to provision the Prometheus datasource and enable the dashboard sidecar.
+
+2.  **Access Grafana**:
+    ```shell
+    make grafana-run
+    ```
+    (Or manually: `kubectl port-forward service/grafana 3000:80 --namespace s-shop-system`)
+    Open [http://localhost:3000](http://localhost:3000)
+
+3.  **Login**:
+    Username: `admin` (password: `admin` if set in values or get it via `make grafana-pass`)
+
+4.  **Wait for the sidecar**:
+    The sidecar takes a minute to pick up the dashboard from the `api-dashboard` ConfigMap.
+
+### Database Metrics
+PostgreSQL metrics are enabled via the Helm chart (`helm/postgresql-values.yaml`) which installs a Prometheus exporter.
+The metrics are automatically scraped by Prometheus from the `postgresql-metrics` service.
 
 ### Application Metrics
 The API service exposes Prometheus metrics at `/metrics`. The `api` service in `k8s/20-service.yaml` is annotated for automatic discovery.
@@ -116,7 +125,7 @@ Metrics:
 - **Error Rate**: `rate(http_requests_total{status=~"5.."}[1m]) / rate(http_requests_total[1m])`
 
 ### Grafana Dashboard
-A pre-configured Grafana dashboard is available in `grapahan/dashboard.json`.
+A pre-configured Grafana dashboard is available in `grafana/dashboard.json` and is automatically loaded via a ConfigMap in `k8s/50-grafana-dashboard.yaml`.
 It includes:
 - **API Metrics**: Latency (p50, p95, p99), RPS, and Error Rate broken down by method and path.
 - **Ingress Metrics**: Global latency, RPS, and Error Rate from Nginx Ingress Controller.
@@ -125,17 +134,13 @@ It includes:
 
 To use the dashboard:
 1.  Open Grafana UI (http://localhost:3000).
-2.  Go to **Dashboards** -> **New** -> **Import**.
-3.  Upload `grapahan/dashboard.json` or paste its content.
+2.  Go to **Dashboards**.
+3.  The **S-Shop Service Dashboard** should appear automatically.
 
 ### Alerting
 Recommended alert thresholds:
 - **Error Rate**: Alert if `sum(rate(http_requests_total{status=~"5.."}[2m])) / sum(rate(http_requests_total[2m])) > 0.05` (5%).
 - **Latency**: Alert if `histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[2m])) by (le)) > 1.0` (1 second).
-
-### Database Metrics
-PostgreSQL metrics are enabled via the Helm chart (`helm/postgresql-values.yaml`) which installs a Prometheus exporter.
-The metrics are automatically scraped by Prometheus from the `postgresql-metrics` service.
 
 ### Prometheus Installation
 You can install Prometheus using the provided manifests or Helm.
@@ -148,15 +153,16 @@ It is configured to:
 
 To access Prometheus UI:
 ```shell
-kubectl port-forward service/prometheus-service 9090:80 -n s-shop-system
+make prometheus-run
 ```
+(Or manually: `kubectl port-forward service/prometheus-server 9090:80 --namespace s-shop-system`)
 Open http://localhost:9090
 
 #### Using Helm
 Alternatively, you can use Helm:
 ```shell
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
+helm repo update prometheus-community
 helm install prometheus prometheus-community/prometheus
 ```
 
