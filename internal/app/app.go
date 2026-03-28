@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/Romasmi/s-shop-microservices/internal/config"
@@ -44,23 +45,23 @@ func (a *App) Shutdown(ctx context.Context) error {
 	var shutdownErr error
 
 	if a.server != nil {
-		fmt.Println("Shutting down HTTP server...")
+		slog.Info("Shutting down HTTP server...")
 		if err := a.server.Shutdown(ctx); err != nil {
 			shutdownErr = fmt.Errorf("server shutdown error: %w", err)
-			fmt.Printf("HTTP server shutdown error: %v\n", err)
+			slog.Error("HTTP server shutdown error", "error", err)
 		}
 	}
 
 	if a.DbConn != nil && a.DbConn.DB != nil {
-		fmt.Println("Closing database connections...")
+		slog.Info("Closing database connections...")
 		select {
 		case <-ctx.Done():
-			fmt.Println("Shutdown timeout reached, forcing database close")
+			slog.Warn("Shutdown timeout reached, forcing database close")
 		default:
 			a.DbConn.DB.Close()
 		}
 	}
 
-	fmt.Println("Cleanup completed")
+	slog.Info("Cleanup completed")
 	return shutdownErr
 }

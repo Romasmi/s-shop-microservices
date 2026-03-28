@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/Romasmi/s-shop-microservices/internal/domain/user"
@@ -40,7 +41,7 @@ func (h *UserHandler) UpdateUserHandler(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		fmt.Printf("error while user update: %v\n", err)
+		slog.Error("error while user update", "error", err)
 		http_utils.JsonInternalServerError(w)
 		return
 	}

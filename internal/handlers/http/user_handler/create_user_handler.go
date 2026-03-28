@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/Romasmi/s-shop-microservices/internal/domain/user"
@@ -24,7 +25,7 @@ func (h *UserHandler) CreateUserHandler(w http.ResponseWriter, r *http.Request) 
 			http_utils.JsonError(w, http.StatusBadRequest, fmt.Errorf("user already exists"))
 			return
 		}
-		fmt.Printf("error while user creation: %v\n", err)
+		slog.Error("error while user creation", "error", err)
 		http_utils.JsonInternalServerError(w)
 		return
 	}

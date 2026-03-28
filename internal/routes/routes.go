@@ -8,6 +8,7 @@ import (
 	"github.com/Romasmi/s-shop-microservices/internal/middleware"
 	"github.com/Romasmi/s-shop-microservices/internal/utils/http_utils"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type App interface {
@@ -26,10 +27,12 @@ func RegisterRoutes(
 		panic("router must be initialized before routes registration")
 	}
 	router.StrictSlash(true)
+	router.Use(middleware.MetricsMiddleware)
 	router.Use(middleware.ResponseHeadersMiddleware)
 	router.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
 	router.MethodNotAllowedHandler = http.HandlerFunc(MethodNotAllowedHandler)
 
+	router.Handle("/metrics", promhttp.Handler()).Methods(http.MethodGet)
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		http_utils.SuccessJsonResponse(w, map[string]string{"status": "OK"})
 	}).Methods(http.MethodGet)
