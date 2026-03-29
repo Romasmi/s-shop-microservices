@@ -59,7 +59,7 @@ Run make command `make deploy` or install manually
 
 ```shell
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/ && \
-helm repo update && \
+helm repo update ingress-nginx && \
 helm install nginx-ingress ingress-nginx/ingress-nginx \
   --namespace ingress-nginx \
   --create-namespace \
@@ -88,3 +88,124 @@ Start tunnel on MacOS/Windows `minikube tunnel`
 curl http://arch.homework:8080/health
 curl http://arch.homework:8080/otusapp/romasmi/health
 ```
+
+## How to add Grafana
+
+Grafana is configured to automatically take data from Prometheus and load the API dashboard.
+
+1.  **Install Grafana** using Helm:
+    ```shell
+    make install-grafana
+    ```
+    This uses `helm/grafana-values.yaml` to provision the Prometheus datasource and enable the dashboard sidecar.
+
+2.  **Access Grafana**:
+    ```shell
+    make grafana-run
+    ```
+    (Or manually: `kubectl port-forward service/grafana 3000:80 --namespace s-shop-system`)
+    Open [http://localhost:3000](http://localhost:3000)
+
+3.  **Login**:
+    Username: `admin` (password: `admin` if set in values or get it via `make grafana-pass`)
+
+4.  **Wait for the sidecar**:
+    The sidecar takes a minute to pick up the dashboard from the `api-dashboard` ConfigMap.
+
+### Database Metrics
+PostgreSQL metrics are enabled via the Helm chart (`helm/postgresql-values.yaml`) which installs a Prometheus exporter.
+The metrics are automatically scraped by Prometheus from the `postgresql-metrics` service.
+
+### Application Metrics
+The API service exposes Prometheus metrics at `/metrics`. The `api` service in `k8s/20-service.yaml` is annotated for automatic discovery.
+
+Metrics:
+- **Latency**: `http_request_duration_seconds_bucket` (Histogram)
+- **RPS (Requests Per Second)**: `rate(http_requests_total[1m])`
+- **Error Rate**: `rate(http_requests_total{status=~"5.."}[1m]) / rate(http_requests_total[1m])`
+
+### Grafana Dashboard
+A pre-configured Grafana dashboard is available in `grafana/dashboard.json` and is automatically loaded via a ConfigMap in `k8s/50-grafana-dashboard.yaml`.
+It includes:
+- **API Metrics**: Latency (p50, p95, p99), RPS, and Error Rate broken down by method and path.
+- **Ingress Metrics**: Global latency, RPS, and Error Rate from Nginx Ingress Controller.
+- **Kubernetes Metrics**: CPU and Memory usage for application pods.
+- **Database Metrics**: PostgreSQL connections, transactions, and database size.
+
+To use the dashboard:
+1.  Open Grafana UI (http://localhost:3000).
+2.  Go to **Dashboards**.
+3.  The **S-Shop Service Dashboard** should appear automatically.
+
+### Alerting
+Recommended alert thresholds:
+- **Error Rate**: Alert if `sum(rate(http_requests_total{status=~"5.."}[2m])) / sum(rate(http_requests_total[2m])) > 0.05` (5%).
+- **Latency**: Alert if `histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[2m])) by (le)) > 1.0` (1 second).
+
+### Prometheus Installation
+You can install Prometheus using the provided manifests or Helm.
+
+#### Using Manifests (Recommended)
+The Prometheus server is included in the `./k8s` directory and is deployed automatically with `make deploy`.
+It is configured to:
+- Scrape application metrics from pods/services with `prometheus.io/scrape: "true"` annotations.
+- Scrape Kubernetes node metrics (cAdvisor) to provide **CPU and Memory usage by pods**.
+
+To access Prometheus UI:
+```shell
+make prometheus-run
+```
+(Or manually: `kubectl port-forward service/prometheus-server 9090:80 --namespace s-shop-system`)
+Open http://localhost:9090
+
+#### Using Helm
+Alternatively, you can use Helm:
+```shell
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update prometheus-community
+helm install prometheus prometheus-community/prometheus
+```
+
+### Nginx Ingress Controller Metrics
+To enable Nginx Ingress metrics, we've updated `helm/nginx-ingress.yaml` with the following configuration:
+```yaml
+controller:
+  metrics:
+    enabled: true
+    service:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+```
+
+### Kubernetes Pod Metrics (CPU/Memory)
+Recommended Prometheus queries:
+- **CPU Usage by Pod**: `sum(rate(container_cpu_usage_seconds_total{container!="", pod!=""}[5m])) by (pod, namespace)`
+- **Memory Usage by Pod**: `sum(container_memory_working_set_bytes{container!="", pod!=""}) by (pod, namespace)`
+
+Make sure `metrics-server` is enabled if you are using Minikube:
+```shell
+minikube addons enable metrics-server
+```
+
+## Load Testing
+
+Install [k6](https://k6.io/) for load testing.
+
+### Run tests
+
+To run the user API load test:
+```shell
+k6 run --vus 1000 --duration 30s load_testing/users.js
+```
+
+Or specify a different base URL:
+```shell
+k6 run --vus 1000 --duration 30s -e BASE_URL=http://arch.homework:8080 load_testing/users.js
+```
+
+The test covers:
+- Create user
+- Get user by ID
+- Update user
+- Delete user

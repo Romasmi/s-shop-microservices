@@ -3,6 +3,10 @@ apiVersion: v1
 metadata:
   name: api
   namespace: s-shop-system
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"
+    prometheus.io/path: "/metrics"
 spec:
   selector:
     app: api

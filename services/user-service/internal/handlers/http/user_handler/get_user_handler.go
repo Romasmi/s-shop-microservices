@@ -3,6 +3,7 @@ package user_handler
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/Romasmi/s-shop-microservices/internal/repository"
@@ -27,7 +28,7 @@ func (h *UserHandler) GetUserHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fmt.Printf("error while retreiving a user: %v\n", err)
+		slog.Error("error while retreiving a user", "error", err)
 		http_utils.JsonInternalServerError(w)
 		return
 	}

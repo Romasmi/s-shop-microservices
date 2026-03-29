@@ -3,6 +3,7 @@ package http_utils
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 )
 
@@ -15,7 +16,7 @@ func JsonResponse(w http.ResponseWriter, statusCode int, output interface{}) {
 	w.WriteHeader(statusCode)
 	err := json.NewEncoder(w).Encode(output)
 	if err != nil {
-		fmt.Printf("error while encoding response: %v\n", err)
+		slog.Error("error while encoding response", "error", err)
 	}
 }
 

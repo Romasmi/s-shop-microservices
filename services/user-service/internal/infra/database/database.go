@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/Romasmi/s-shop-microservices/internal/config"
@@ -45,7 +45,7 @@ func (c *Connection) Connect() error {
 func (c *Connection) Close() {
 	if c.DB != nil {
 		c.DB.Close()
-		log.Println("database connection closed")
+		slog.Info("database connection closed")
 	}
 }
 
