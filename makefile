@@ -2,12 +2,6 @@
 
 up: build deploy restart wait-api
 
-build:
-	docker build --platform linux/amd64 -t romasmi/s-shop-system:latest -f docker/api/Dockerfile .
-	@if minikube status >/dev/null 2>&1; then \
-		echo "Loading image into minikube..."; \
-		minikube image load romasmi/s-shop-system:latest; \
-	fi
 
 deploy: install-ingress install-db install-grafana apply hosts wait-db
 	@echo "Completed"
@@ -137,3 +131,9 @@ help:
 	@echo "  1. make deploy"
 	@echo "  2. make run"
 	@echo "  3. curl http://arch.homework:8080/otusapp/romasmi/health"
+
+docker-build:
+	$(MAKE) -C ./services/user-service docker-build
+
+docker-push:
+	$(MAKE) -C ./services/user-service docker-push
