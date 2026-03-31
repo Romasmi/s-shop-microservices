@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Romasmi/s-shop-microservices/internal/app"
+	"github.com/Romasmi/s-shop-microservices/internal/infra/database"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -33,7 +34,7 @@ func main() {
 	absPath, _ := filepath.Abs(migrationsPath)
 	m, err := migrate.New(
 		"file://"+absPath,
-		appInstance.Config.Database.URL,
+		database.GetDbUrl(&appInstance.Config.Database),
 	)
 	if m == nil || err != nil {
 		slog.Error("unable to create migrations driver", "error", err)

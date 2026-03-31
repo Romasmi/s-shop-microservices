@@ -12,30 +12,18 @@ import (
 type Config struct {
 	Database Database
 	Server   Server
-	Redis    Redis
-	Kafka    Kafka
 }
 
 type Database struct {
-	URL                   string
-	MaxConnections        uint
-	MinConnections        uint
-	MaxConnectionLifetime uint
-	MaxConnectionIdleTime uint
+	Host     string `mapstructure:"db_host"`
+	Post     string `mapstructure:"db_port"`
+	Name     string `mapstructure:"db_name"`
+	User     string `mapstructure:"db_user"`
+	Password string `mapstructure:"db_password"`
 }
 
 type Server struct {
 	Port uint
-}
-
-type Redis struct {
-	Host     string
-	Username string
-	Password string
-}
-
-type Kafka struct {
-	Brokers string
 }
 
 func bindEnvRecursive(viperInstance *viper.Viper, prefix string, val reflect.Value) error {

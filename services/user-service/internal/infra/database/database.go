@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"os"
 	"time"
 
 	"github.com/Romasmi/s-shop-microservices/internal/config"
-	"github.com/Romasmi/s-shop-microservices/internal/utils/time_utils"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -17,15 +16,26 @@ type Connection struct {
 	Config *config.Database
 }
 
+func GetDbUrl(c *config.Database) string {
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		os.Getenv(c.User),
+		os.Getenv(c.Password),
+		os.Getenv(c.Host),
+		os.Getenv(c.Post),
+		os.Getenv(c.Name),
+	)
+}
+
 func (c *Connection) Connect() error {
-	pgConfig, err := pgxpool.ParseConfig(c.Config.URL)
+	pgConfig, err := pgxpool.ParseConfig(GetDbUrl(c.Config))
 	if err != nil {
 		return fmt.Errorf("unable to parse database URL: %w", err)
 	}
-	pgConfig.MaxConns = int32(c.Config.MaxConnections)
-	pgConfig.MinConns = int32(c.Config.MinConnections)
-	pgConfig.MaxConnLifetime = time_utils.MinutesToNanoseconds(c.Config.MaxConnectionLifetime)
-	pgConfig.MaxConnIdleTime = time_utils.MinutesToNanoseconds(c.Config.MaxConnectionIdleTime)
+	//pgConfig.MaxConns = int32(c.Config.MaxConnections)
+	//pgConfig.MinConns = int32(c.Config.MinConnections)
+	//pgConfig.MaxConnLifetime = time_utils.MinutesToNanoseconds(c.Config.MaxConnectionLifetime)
+	//pgConfig.MaxConnIdleTime = time_utils.MinutesToNanoseconds(c.Config.MaxConnectionIdleTime)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
