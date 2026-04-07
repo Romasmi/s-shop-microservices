@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"os"
 	"time"
 
 	"github.com/Romasmi/s-shop-microservices/internal/config"
@@ -19,11 +18,11 @@ type Connection struct {
 func GetDbUrl(c *config.Database) string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		os.Getenv(c.User),
-		os.Getenv(c.Password),
-		os.Getenv(c.Host),
-		os.Getenv(c.Post),
-		os.Getenv(c.Name),
+		c.User,
+		c.Password,
+		c.Host,
+		c.Post,
+		c.Name,
 	)
 }
 

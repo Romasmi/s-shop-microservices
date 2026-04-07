@@ -32,7 +32,7 @@ func (a *App) init(configPath string) error {
 	}
 	a.Config = envConfig
 
-	dbConn := &database.Connection{Config: &envConfig.Database}
+	dbConn := &database.Connection{Config: &envConfig.Db}
 	if err = dbConn.Connect(); err != nil {
 		return fmt.Errorf("error connecting to DB: %v\n", err)
 	}

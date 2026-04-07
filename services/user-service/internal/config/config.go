@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -10,16 +11,16 @@ import (
 )
 
 type Config struct {
-	Database Database
-	Server   Server
+	Db     Database
+	Server Server
 }
 
 type Database struct {
-	Host     string `mapstructure:"db_host"`
-	Post     string `mapstructure:"db_port"`
-	Name     string `mapstructure:"db_name"`
-	User     string `mapstructure:"db_user"`
-	Password string `mapstructure:"db_password"`
+	Host     string `mapstructure:"host"`
+	Post     string `mapstructure:"port"`
+	Name     string `mapstructure:"name"`
+	User     string `mapstructure:"user"`
+	Password string `mapstructure:"password"`
 }
 
 type Server struct {
@@ -89,5 +90,6 @@ func LoadConfig(configPath string) (*Config, error) {
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
+	fmt.Println("cfg", cfg)
 	return &cfg, nil
 }
