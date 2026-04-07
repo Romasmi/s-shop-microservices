@@ -137,3 +137,7 @@ docker-build:
 
 docker-push:
 	$(MAKE) -C ./services/user-service docker-push
+
+deploy-helm:
+	helm upgrade --install user . --set serviceName=user
+	helm upgrade --install auth . --set serviceName=auth

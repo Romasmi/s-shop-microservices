@@ -34,7 +34,7 @@ func main() {
 	absPath, _ := filepath.Abs(migrationsPath)
 	m, err := migrate.New(
 		"file://"+absPath,
-		database.GetDbUrl(&appInstance.Config.Database),
+		database.GetDbUrl(&appInstance.Config.Db),
 	)
 	if m == nil || err != nil {
 		slog.Error("unable to create migrations driver", "error", err)
