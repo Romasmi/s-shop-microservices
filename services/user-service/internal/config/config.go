@@ -17,7 +17,7 @@ type Config struct {
 
 type Database struct {
 	Host     string `mapstructure:"host"`
-	Post     string `mapstructure:"port"`
+	Port     string `mapstructure:"port"`
 	Name     string `mapstructure:"name"`
 	User     string `mapstructure:"user"`
 	Password string `mapstructure:"password"`

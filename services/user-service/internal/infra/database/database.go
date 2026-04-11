@@ -21,7 +21,7 @@ func GetDbUrl(c *config.Database) string {
 		c.User,
 		c.Password,
 		c.Host,
-		c.Post,
+		c.Port,
 		c.Name,
 	)
 }

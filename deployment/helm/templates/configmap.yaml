@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: '{{ printf "%s-config" (include "s-shop-system.fullname" .) }}'
-data:
-  DB_HOST: '{{ index .Values.services .Values.serviceName "db" "host" | quote }}'
-  DB_PORT: '{{ index .Values.services .Values.serviceName "db" "port" | quote }}'
-  DB_NAME: '{{ index .Values.services .Values.serviceName "db" "name" | quote }}'

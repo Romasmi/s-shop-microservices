@@ -1,7 +1,11 @@
 server:
   port: 8000
 database:
-  url: postgres://user:password@db.docker.localhost:5432/social_network?sslmode=disable
+  host: postgresql
+  port: "5432"
+  name: user_service
+  user: user
+  password: password
   maxConnections: 100
   minConnection: 2
   maxConnectionLifetime: 60 # seconds

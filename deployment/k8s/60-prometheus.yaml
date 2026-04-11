@@ -166,4 +166,4 @@ spec:
   ports:
     - port: 80
       targetPort: 9090
-  type: LoadBalancer
+  type: ClusterIP
