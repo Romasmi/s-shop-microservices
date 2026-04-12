@@ -27,7 +27,8 @@ install-traefik:
 		--create-namespace \
 		--set "service.type=LoadBalancer" \
 		--set "ports.web.exposedPort=8080" \
-		--set "ports.websecure.exposedPort=8443"
+		--set "ports.websecure.exposedPort=8443" \
+		--set "api.dashboard=true"
 
 install-db:
 	helm repo add bitnami https://repo.broadcom.com/bitnami-files/ || true
@@ -53,7 +54,9 @@ hosts:
 
 run:
 	@echo "Starting port-forwarding for Traefik... (Keep this running)"
-	@echo "API available at: http://arch.homework:8080"
+	@echo "Access API: http://arch.homework:8080"
+	@echo "Access Traefik Dashboard: http://arch.homework:8080/dashboard/"
+	@echo "Access Grafana: http://localhost:3000 (after make grafana-run)"
 	kubectl port-forward service/traefik 8080:8080 -n traefik
 
 wait-db:
@@ -110,4 +113,5 @@ help:
 	@echo "Quick Start:"
 	@echo "  1. make up"
 	@echo "  2. make run (in another terminal)"
-	@echo "  3. Access: http://arch.homework:8080/user"
+	@echo "  3. Access API: http://arch.homework:8080/user"
+	@echo "  4. Access Dashboard: http://arch.homework:8080/dashboard/"

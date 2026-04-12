@@ -29,6 +29,11 @@ spec:
     - web
   routes:
     - kind: Rule
+      match: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+      services:
+        - name: api@internal
+          kind: TraefikService
+    - kind: Rule
       match: PathPrefix(`/health`)
       services:
         - name: user-service
