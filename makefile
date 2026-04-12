@@ -8,6 +8,10 @@ build:
 	$(MAKE) -C ./services/user-service docker-build
 	$(MAKE) -C ./services/auth-service docker-build
 
+docker-push:
+	$(MAKE) -C ./services/user-service docker-push
+	$(MAKE) -C ./services/auth-service docker-push
+
 # Deploy all components
 deploy: install-traefik install-db install-grafana apply hosts wait-db
 

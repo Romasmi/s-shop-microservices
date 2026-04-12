@@ -12,6 +12,17 @@ import (
 	"github.com/Romasmi/s-shop-microservices/internal/utils/http_utils"
 )
 
+type CreateUserResponse struct {
+	ID        string `json:"id"`
+	Username  string `json:"username"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Password  string `json:"password"`
+	CreatedAt string `json:"createdAt"`
+}
+
 func (h *UserHandler) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	var payload user.User
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
@@ -30,5 +41,14 @@ func (h *UserHandler) CreateUserHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	http_utils.SuccessJsonResponse(w, newUser)
+	http_utils.SuccessJsonResponse(w, CreateUserResponse{
+		ID:        newUser.ID.String(),
+		Username:  newUser.Username,
+		FirstName: newUser.FirstName,
+		LastName:  newUser.LastName,
+		Email:     newUser.Email,
+		Phone:     newUser.Phone,
+		Password:  newUser.Password,
+		CreatedAt: newUser.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	})
 }
