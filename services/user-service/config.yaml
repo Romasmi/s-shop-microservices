@@ -1,5 +1,6 @@
 server:
   port: 8000
+auth_service_url: "http://auth-service.s-shop-system.svc.cluster.local:8000"
 database:
   host: postgresql
   port: "5432"

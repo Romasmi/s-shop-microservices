@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/Romasmi/s-shop-microservices/internal/config"
-	"github.com/Romasmi/s-shop-microservices/internal/infra/database"
+	"github.com/Romasmi/s-shop-microservices/auth-service/internal/config"
+	"github.com/Romasmi/s-shop-microservices/auth-service/internal/infra/database"
 )
 
 type App struct {
@@ -56,14 +56,9 @@ func (a *App) Shutdown(ctx context.Context) error {
 		}
 	}
 
-	if a.DbConn != nil && a.DbConn.DB != nil {
+	if a.DbConn != nil {
 		slog.Info("Closing database connections...")
-		select {
-		case <-ctx.Done():
-			slog.Warn("Shutdown timeout reached, forcing database close")
-		default:
-			a.DbConn.DB.Close()
-		}
+		a.DbConn.Close()
 	}
 
 	slog.Info("Cleanup completed")

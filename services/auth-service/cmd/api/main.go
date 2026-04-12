@@ -3,121 +3,72 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
-	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
 	"time"
 
+	"github.com/Romasmi/s-shop-microservices/auth-service/internal/app"
+	"github.com/Romasmi/s-shop-microservices/auth-service/internal/infra/database"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/gorilla/mux"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func getDbUrl() string {
-	return fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
-	)
-}
-
 func main() {
-	port := os.Getenv("SERVER_PORT")
-	if port == "" {
-		port = "8000"
-	}
-
-	dbUrl := getDbUrl()
-	slog.Info("Connecting to database", "url", dbUrl)
-
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
-
-	dbPool, err := pgxpool.New(ctx, dbUrl)
-	if err != nil {
-		slog.Error("unable to connect to database", "error", err)
-		os.Exit(1)
-	}
-	defer dbPool.Close()
-
-	// Run migrations
 	basePath := os.Getenv("APP_BASE_PATH")
 	if basePath == "" {
-		basePath = "."
+		basePath = "." // current directory
 	}
+
+	appInstance, err := app.NewApp(basePath)
+	if err != nil {
+		slog.Error("error while app init", "error", err)
+		os.Exit(1)
+	}
+	api := app.NewApi(appInstance)
+
 	migrationsPath := filepath.Join(basePath, "migrations")
 	absPath, _ := filepath.Abs(migrationsPath)
-	slog.Info("Running migrations", "path", absPath)
 	m, err := migrate.New(
 		"file://"+absPath,
-		dbUrl,
+		database.GetDbUrl(&appInstance.Config.Db),
 	)
-	if err != nil {
+	if m == nil || err != nil {
 		slog.Error("unable to create migrations driver", "error", err)
-	} else {
-		err = m.Up()
-		if err != nil {
-			if errors.Is(err, migrate.ErrNoChange) {
-				slog.Info("no migrations to apply")
-			} else {
-				slog.Error("error while running up migrations", "error", err)
-				os.Exit(1)
-			}
-		} else {
-			slog.Info("migrations applied successfully")
-		}
-		m.Close()
+		os.Exit(1)
 	}
-
-	router := mux.NewRouter()
-	router.Handle("/metrics", promhttp.Handler()).Methods(http.MethodGet)
-	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(w, `{"status":"OK"}`)
-	}).Methods(http.MethodGet)
-
-	router.HandleFunc("/auth", func(w http.ResponseWriter, r *http.Request) {
-		_, err := dbPool.Exec(r.Context(), "INSERT INTO auth_logs (user_id, login) VALUES ($1, $2)", "1", "admin")
-		if err != nil {
-			slog.Error("failed to log auth to db", "error", err)
-		}
-
-		w.Header().Set("X-Auth-User-ID", "1")
-		w.Header().Set("X-Auth-User-Login", "admin")
-		w.WriteHeader(http.StatusOK)
-	}).Methods(http.MethodGet)
-
-	server := &http.Server{
-		Addr:    ":" + port,
-		Handler: router,
-	}
-
-	go func() {
-		slog.Info("Auth service starting", "port", port)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			slog.Error("server error", "error", err)
-			os.Exit(1)
+	defer func() {
+		if sourceErr, dbErr := m.Close(); sourceErr != nil || dbErr != nil {
+			slog.Error("Error closing migration driver", "source_err", sourceErr, "db_err", dbErr)
 		}
 	}()
 
-	<-ctx.Done()
+	err = m.Up()
+
+	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		slog.Error("error while running up migrations", "error", err)
+		os.Exit(1)
+	}
+
+	go func() {
+		if err := api.Run(); err != nil {
+			slog.Error("server error", "error", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 
 	slog.Info("Shutting down gracefully...")
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	if err := server.Shutdown(shutdownCtx); err != nil {
+	if err := api.Shutdown(ctx); err != nil {
 		slog.Error("Error during shutdown", "error", err)
 	}
 

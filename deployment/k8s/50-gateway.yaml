@@ -35,6 +35,12 @@ spec:
           namespace: s-shop-system
           port: 8000
     - kind: Rule
+      match: PathPrefix(`/login`)
+      services:
+        - name: auth-service
+          namespace: s-shop-system
+          port: 8000
+    - kind: Rule
       match: PathPrefix(`/auth`)
       services:
         - name: auth-service

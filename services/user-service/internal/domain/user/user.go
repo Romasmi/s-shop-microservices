@@ -13,5 +13,6 @@ type User struct {
 	LastName  string    `json:"lastName,omitzero"`
 	Email     string    `json:"email,omitzero"`
 	Phone     string    `json:"phone,omitzero"`
+	Password  string    `json:"password,omitzero"`
 	CreatedAt time.Time `json:"createdAt,omitzero"`
 }

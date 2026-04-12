@@ -1,19 +1,18 @@
 package config
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 
-	"github.com/Romasmi/s-shop-microservices/internal/utils/string_utils"
+	"github.com/Romasmi/s-shop-microservices/auth-service/internal/utils/string_utils"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Db             Database
-	Server         Server
-	AuthServiceURL string `mapstructure:"auth_service_url"`
+	Db     Database
+	Server Server
+	Jwt    Jwt
 }
 
 type Database struct {
@@ -26,6 +25,11 @@ type Database struct {
 
 type Server struct {
 	Port uint
+}
+
+type Jwt struct {
+	Secret     string `mapstructure:"secret"`
+	Expiration uint   `mapstructure:"expiration"` // in minutes
 }
 
 func bindEnvRecursive(viperInstance *viper.Viper, prefix string, val reflect.Value) error {
@@ -91,6 +95,5 @@ func LoadConfig(configPath string) (*Config, error) {
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
-	fmt.Println("cfg", cfg)
 	return &cfg, nil
 }

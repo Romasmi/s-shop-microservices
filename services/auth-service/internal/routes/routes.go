@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Romasmi/s-shop-microservices/internal/config"
-	"github.com/Romasmi/s-shop-microservices/internal/infra/database"
-	"github.com/Romasmi/s-shop-microservices/internal/middleware"
-	"github.com/Romasmi/s-shop-microservices/internal/utils/http_utils"
+	"github.com/Romasmi/s-shop-microservices/auth-service/internal/config"
+	"github.com/Romasmi/s-shop-microservices/auth-service/internal/infra/database"
+	"github.com/Romasmi/s-shop-microservices/auth-service/internal/middleware"
+	"github.com/Romasmi/s-shop-microservices/auth-service/internal/utils/http_utils"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -15,10 +15,6 @@ import (
 type App interface {
 	GetDB() *database.Connection
 	GetConfig() *config.Config
-}
-
-type NotFoundResponse struct {
-	Error string `json:"error"`
 }
 
 func RegisterRoutes(
@@ -39,7 +35,7 @@ func RegisterRoutes(
 		http_utils.SuccessJsonResponse(w, map[string]string{"status": "OK"})
 	}).Methods(http.MethodGet)
 
-	RegisterUserRoutes(router, app.GetDB().DB, app.GetConfig())
+	RegisterAuthRoutes(router, app.GetDB().DB, app.GetConfig())
 }
 
 func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
