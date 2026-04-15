@@ -18,7 +18,7 @@ spec:
       containers:
         - name: app
           image: romasmi/s-shop-system:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: user-config
@@ -63,7 +63,7 @@ spec:
       containers:
         - name: app
           image: romasmi/auth-service:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: auth-config

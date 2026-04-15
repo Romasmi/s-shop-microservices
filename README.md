@@ -4,6 +4,8 @@
 
 ## Quick Start (from scratch)
 
+Ensure minikube is running else run `minikube start`
+
 To deploy everything in Minikube:
 
 1.  **Build and Deploy**:
