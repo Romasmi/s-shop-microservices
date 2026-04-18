@@ -1,0 +1,50 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: user-auth
+  namespace: s-shop-system
+spec:
+  forwardAuth:
+    address: http://auth-service.s-shop-system.svc.cluster.local:8000/auth
+    authResponseHeaders:
+      - X-Auth-User-ID
+      - X-Auth-User-Login
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: internal-auth
+  namespace: s-shop-system
+spec:
+  basicAuth:
+    secret: internal-auth-basic-access
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: public-api
+  namespace: s-shop-system
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+      services:
+        - name: api@internal
+          kind: TraefikService
+    - kind: Rule
+      match: PathPrefix(`/auth`)
+      services:
+        - name: auth-service
+          namespace: s-shop-system
+          port: 8000
+    - kind: Rule
+      match: PathPrefix(`/user`)
+      middlewares:
+        - name: user-auth
+          namespace: s-shop-system
+      services:
+        - name: user-service
+          namespace: s-shop-system
+          port: 8000

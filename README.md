@@ -2,210 +2,54 @@
 
 ## Quick Start
 
-To start the API locally using Minikube:
+## Quick Start (from scratch)
 
-1.  **Start the tunnel** (in a separate terminal):
-    ```shell
-    make run
-    ```
+Ensure minikube is running else run `minikube start`
 
-2.  **Start the environment**:
+To deploy everything in Minikube:
+
+0. **Add hosts**
+```shell
+make hosts
+```
+
+1.  **Build and Deploy**:
     ```shell
     make up
     ```
-    This command builds the Docker image, installs the Ingress controller, PostgreSQL database via Helm, applies application manifests, configures `/etc/hosts`, and waits for the API to be ready (it runs migrations automatically on startup).
-    *Note: The tunnel must be running to access the API via hostnames.*
+    This command builds Docker images, installs PostgreSQL, Grafana, and Traefik via Helm, and applies all Kubernetes manifests from `deployment/k8s/`.
 
-3.  **Access the API**:
-    The API is available at `http://arch.homework:8080`.
-
-    Example:
+2.  **Start API Proxy**:
     ```shell
-    curl -X POST http://arch.homework:8080/user \
-    --header 'Content-Type: application/json' \
-    --data-raw '{
-      "username": "johndoe",
-      "firstName": "John",
-      "lastName": "Doe",
-      "email": "john@doe.com",
-      "phone": "+71002003040"
-    }'
+    make run
+    ```
+    *Keep this command running in a separate terminal. It enables access via http://arch.homework:8080*
+
+3.  **Verify**:
+    ```shell
+    make status
     ```
 
-## Development
+## Accessing the API
 
-### Database Migrations
-To run migrations manually:
+The API is exposed at `http://arch.homework:8080` (ensure `make up` added the entry to your `/etc/hosts`).
+
+- **Health Check**: `curl http://arch.homework:8080/health`
+- **Auth Endpoint**: `curl http://arch.homework:8080/auth`
+- **User API**: `curl http://arch.homework:8080/user`
+
+## Monitoring
+
+- **Prometheus**: Run `make prometheus-run` and open [http://localhost:9090](http://localhost:9090)
+- **Grafana**: Run `make grafana-run` and open [http://localhost:3000](http://localhost:3000) (User: `admin`, get password via `make grafana-pass`)
+
+## Project Structure
+
+- `services/`: Source code for microservices.
+- `deployment/k8s/`: Kubernetes manifests (ordered 00-70).
+- `deployment/helm/`: Helm values for infrastructure components.
+
+## Load tests 
 ```shell
-make migration-up
+k6 run load_testing/users.js
 ```
-
-### Build Docker Image
-```shell
-make build
-```
-Or manually:
-```shell
-docker build --platform linux/amd64 -t romasmi/s-shop-system:latest -f docker/api/Dockerfile .
-```
-
-https://hub.docker.com/r/romasmi/s-shop-system
-
-
-## How to deploy kubernates
-Run make command `make deploy` or install manually
-
-### Install ingress
-
-```shell
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/ && \
-helm repo update ingress-nginx && \
-helm install nginx-ingress ingress-nginx/ingress-nginx \
-  --namespace ingress-nginx \
-  --create-namespace \
-  --values nginx-ingress.yaml
-```
-
-### Apply k8s manifests
-```shell
-kubectl apply -f ./k8s
-```
-
-### If you use minikube then start tunnel
-```shell
-minikube tunnel
-```
-and add host to /etc/hosts
-
-```shell
-echo "127.0.0.1 arch.homework" | sudo tee -a /etc/hosts
-```
-
-### Test
-Start tunnel on MacOS/Windows `minikube tunnel`
-
-```shell
-curl http://arch.homework:8080/health
-curl http://arch.homework:8080/otusapp/romasmi/health
-```
-
-## How to add Grafana
-
-Grafana is configured to automatically take data from Prometheus and load the API dashboard.
-
-1.  **Install Grafana** using Helm:
-    ```shell
-    make install-grafana
-    ```
-    This uses `helm/grafana-values.yaml` to provision the Prometheus datasource and enable the dashboard sidecar.
-
-2.  **Access Grafana**:
-    ```shell
-    make grafana-run
-    ```
-    (Or manually: `kubectl port-forward service/grafana 3000:80 --namespace s-shop-system`)
-    Open [http://localhost:3000](http://localhost:3000)
-
-3.  **Login**:
-    Username: `admin` (password: `admin` if set in values or get it via `make grafana-pass`)
-
-4.  **Wait for the sidecar**:
-    The sidecar takes a minute to pick up the dashboard from the `api-dashboard` ConfigMap.
-
-### Database Metrics
-PostgreSQL metrics are enabled via the Helm chart (`helm/postgresql-values.yaml`) which installs a Prometheus exporter.
-The metrics are automatically scraped by Prometheus from the `postgresql-metrics` service.
-
-### Application Metrics
-The API service exposes Prometheus metrics at `/metrics`. The `api` service in `k8s/20-service.yaml` is annotated for automatic discovery.
-
-Metrics:
-- **Latency**: `http_request_duration_seconds_bucket` (Histogram)
-- **RPS (Requests Per Second)**: `rate(http_requests_total[1m])`
-- **Error Rate**: `rate(http_requests_total{status=~"5.."}[1m]) / rate(http_requests_total[1m])`
-
-### Grafana Dashboard
-A pre-configured Grafana dashboard is available in `grafana/dashboard.json` and is automatically loaded via a ConfigMap in `k8s/50-grafana-dashboard.yaml`.
-It includes:
-- **API Metrics**: Latency (p50, p95, p99), RPS, and Error Rate broken down by method and path.
-- **Ingress Metrics**: Global latency, RPS, and Error Rate from Nginx Ingress Controller.
-- **Kubernetes Metrics**: CPU and Memory usage for application pods.
-- **Database Metrics**: PostgreSQL connections, transactions, and database size.
-
-To use the dashboard:
-1.  Open Grafana UI (http://localhost:3000).
-2.  Go to **Dashboards**.
-3.  The **S-Shop Service Dashboard** should appear automatically.
-
-### Alerting
-Recommended alert thresholds:
-- **Error Rate**: Alert if `sum(rate(http_requests_total{status=~"5.."}[2m])) / sum(rate(http_requests_total[2m])) > 0.05` (5%).
-- **Latency**: Alert if `histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[2m])) by (le)) > 1.0` (1 second).
-
-### Prometheus Installation
-You can install Prometheus using the provided manifests or Helm.
-
-#### Using Manifests (Recommended)
-The Prometheus server is included in the `./k8s` directory and is deployed automatically with `make deploy`.
-It is configured to:
-- Scrape application metrics from pods/services with `prometheus.io/scrape: "true"` annotations.
-- Scrape Kubernetes node metrics (cAdvisor) to provide **CPU and Memory usage by pods**.
-
-To access Prometheus UI:
-```shell
-make prometheus-run
-```
-(Or manually: `kubectl port-forward service/prometheus-server 9090:80 --namespace s-shop-system`)
-Open http://localhost:9090
-
-#### Using Helm
-Alternatively, you can use Helm:
-```shell
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update prometheus-community
-helm install prometheus prometheus-community/prometheus
-```
-
-### Nginx Ingress Controller Metrics
-To enable Nginx Ingress metrics, we've updated `helm/nginx-ingress.yaml` with the following configuration:
-```yaml
-controller:
-  metrics:
-    enabled: true
-    service:
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "10254"
-```
-
-### Kubernetes Pod Metrics (CPU/Memory)
-Recommended Prometheus queries:
-- **CPU Usage by Pod**: `sum(rate(container_cpu_usage_seconds_total{container!="", pod!=""}[5m])) by (pod, namespace)`
-- **Memory Usage by Pod**: `sum(container_memory_working_set_bytes{container!="", pod!=""}) by (pod, namespace)`
-
-Make sure `metrics-server` is enabled if you are using Minikube:
-```shell
-minikube addons enable metrics-server
-```
-
-## Load Testing
-
-Install [k6](https://k6.io/) for load testing.
-
-### Run tests
-
-To run the user API load test:
-```shell
-k6 run --vus 1000 --duration 30s load_testing/users.js
-```
-
-Or specify a different base URL:
-```shell
-k6 run --vus 1000 --duration 30s -e BASE_URL=http://arch.homework:8080 load_testing/users.js
-```
-
-The test covers:
-- Create user
-- Get user by ID
-- Update user
-- Delete user
