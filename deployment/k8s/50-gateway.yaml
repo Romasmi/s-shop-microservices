@@ -22,7 +22,7 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: arch-course
+  name: public-api
   namespace: s-shop-system
 spec:
   entryPoints:
@@ -34,18 +34,6 @@ spec:
         - name: api@internal
           kind: TraefikService
     - kind: Rule
-      match: PathPrefix(`/health`)
-      services:
-        - name: user-service
-          namespace: s-shop-system
-          port: 8000
-    - kind: Rule
-      match: PathPrefix(`/login`)
-      services:
-        - name: auth-service
-          namespace: s-shop-system
-          port: 8000
-    - kind: Rule
       match: PathPrefix(`/auth`)
       services:
         - name: auth-service
@@ -56,12 +44,6 @@ spec:
       middlewares:
         - name: user-auth
           namespace: s-shop-system
-      services:
-        - name: user-service
-          namespace: s-shop-system
-          port: 8000
-    - kind: Rule
-      match: PathPrefix(`/`)
       services:
         - name: user-service
           namespace: s-shop-system

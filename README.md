@@ -8,6 +8,11 @@ Ensure minikube is running else run `minikube start`
 
 To deploy everything in Minikube:
 
+0. **Add hosts**
+```shell
+make hosts
+```
+
 1.  **Build and Deploy**:
     ```shell
     make up

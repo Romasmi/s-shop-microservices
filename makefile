@@ -13,7 +13,7 @@ docker-push:
 	$(MAKE) -C ./services/auth-service docker-push
 
 # Deploy all components
-deploy: install-traefik install-db install-grafana apply hosts wait-db
+deploy: install-traefik install-db install-grafana  apply
 
 apply:
 	kubectl apply -f ./deployment/k8s/
