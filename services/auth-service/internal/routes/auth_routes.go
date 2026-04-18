@@ -16,7 +16,7 @@ func RegisterAuthRoutes(r *mux.Router, db *pgxpool.Pool, cfg *config.Config) {
 	authService := services.CreateAuthService(authRepo, cfg)
 	authHandler := auth_handler.NewAuthHandler(authService)
 
-	r.HandleFunc("/login", authHandler.LoginHandler).Methods(http.MethodPost)
 	r.HandleFunc("/auth", authHandler.ValidateHandler).Methods(http.MethodGet)
-	r.HandleFunc("/register", authHandler.RegisterHandler).Methods(http.MethodPost)
+	r.HandleFunc("/auth/register", authHandler.RegisterHandler).Methods(http.MethodPost)
+	r.HandleFunc("/auth/login", authHandler.LoginHandler).Methods(http.MethodPost)
 }

@@ -55,7 +55,7 @@ func (s *UserService) registerInAuth(ctx context.Context, userID, login, passwor
 		"password": password,
 	})
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, s.authServiceURL+"/register", bytes.NewBuffer(reqBody))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, s.authServiceURL+"/auth/register", bytes.NewBuffer(reqBody))
 	if err != nil {
 		return err
 	}
