@@ -11,3 +11,10 @@ make forward-db # to connect to db via local client
 make db-connect
 ```
 then add DB manuall.
+
+# Install traefik
+```shell
+make install-traefik
+make forward-traefik # expose it to get locally http://localhost:9000/
+```
+

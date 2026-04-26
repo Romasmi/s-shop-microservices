@@ -12,9 +12,6 @@ docker-push:
 	$(MAKE) -C ./services/user-service docker-push
 	$(MAKE) -C ./services/auth-service docker-push
 
-# Deploy all components
-deploy: install-traefik install-grafana wait-db apply
-
 apply:
 	kubectl apply -f ./deployment/k8s/
 
@@ -22,13 +19,14 @@ apply:
 install-traefik:
 	helm repo add traefik https://traefik.github.io/charts || true
 	helm repo update traefik
+
 	helm upgrade --install traefik traefik/traefik \
-		--namespace traefik \
-		--create-namespace \
-		--set "service.type=LoadBalancer" \
-		--set "ports.web.exposedPort=8080" \
-		--set "ports.websecure.exposedPort=8443" \
-		--set "api.dashboard=true"
+	  --namespace traefik \
+	  --create-namespace \
+	  -f ./deployment/helm/traefik-values.yaml
+
+forward-traefik:
+	kubectl port-forward -n traefik $$(kubectl get pods -n traefik -o name) 9000:9000
 
 install-db:
 	helm repo add bitnami https://repo.broadcom.com/bitnami-files/
