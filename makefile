@@ -13,7 +13,7 @@ docker-push:
 	$(MAKE) -C ./services/auth-service docker-push
 
 # Deploy all components
-deploy: install-traefik install-db install-grafana  apply
+deploy: install-traefik install-grafana wait-db apply
 
 apply:
 	kubectl apply -f ./deployment/k8s/
@@ -31,12 +31,27 @@ install-traefik:
 		--set "api.dashboard=true"
 
 install-db:
-	helm repo add bitnami https://repo.broadcom.com/bitnami-files/ || true
+	helm repo add bitnami https://repo.broadcom.com/bitnami-files/
 	helm repo update bitnami
 	helm upgrade --install postgresql bitnami/postgresql \
 		--namespace s-shop-system \
 		--create-namespace \
 		--values deployment/helm/postgresql-values.yaml
+
+db-connect:
+	kubectl exec -it postgresql-0 -n s-shop-system -- \
+		psql -U user -d postgres
+
+forward-db:
+	kubectl port-forward svc/postgresql 5432:5432 -n s-shop-system
+
+
+install-prometheus:
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+	helm repo update prometheus-community
+	helm upgrade --install prometheus prometheus-community/prometheus \
+		--namespace s-shop-system \
+		--create-namespace
 
 install-grafana:
 	helm repo add grafana https://grafana.github.io/helm-charts || true

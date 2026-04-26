@@ -17,6 +17,15 @@ primary:
         
         GRANT ALL PRIVILEGES ON DATABASE user_service TO "user";
         GRANT ALL PRIVILEGES ON DATABASE auth_service TO "user";
+
+readReplicas:
+  replicaCount: 2
+  persistence:
+    enabled: true
+    size: 5Gi
+  service:
+    type: ClusterIP
+
 metrics:
   enabled: true
   service:
