@@ -53,3 +53,8 @@ The API is exposed at `http://arch.homework:8080` (ensure `make up` added the en
 ```shell
 k6 run load_testing/users.js
 ```
+
+## Postman tests
+```shell
+newman run docs/arch_homework.postman_collection.json --verbose
+```
