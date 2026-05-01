@@ -98,6 +98,27 @@ func (r *UserRepository) GetUserById(ctx context.Context, userId uuid.UUID) (*us
 }
 
 func (r *UserRepository) UpdateUser(ctx context.Context, userModel *user.User) (*user.User, error) {
+	current, err := r.GetUserById(ctx, userModel.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if userModel.Username != "" {
+		current.Username = userModel.Username
+	}
+	if userModel.FirstName != "" {
+		current.FirstName = userModel.FirstName
+	}
+	if userModel.LastName != "" {
+		current.LastName = userModel.LastName
+	}
+	if userModel.Email != "" {
+		current.Email = userModel.Email
+	}
+	if userModel.Phone != "" {
+		current.Phone = userModel.Phone
+	}
+
 	const query = `
 		UPDATE %s
 		SET username = $2, firstname = $3, lastname = $4, email = $5, phone = $6, updated_at = NOW()
@@ -107,7 +128,7 @@ func (r *UserRepository) UpdateUser(ctx context.Context, userModel *user.User) (
 	sql := fmt.Sprintf(query, usersTable)
 
 	updatedUser := &user.User{}
-	err := r.db.QueryRow(ctx, sql, userModel.ID, userModel.Username, userModel.FirstName, userModel.LastName, userModel.Email, userModel.Phone).Scan(
+	err = r.db.QueryRow(ctx, sql, current.ID, current.Username, current.FirstName, current.LastName, current.Email, current.Phone).Scan(
 		&updatedUser.ID,
 		&updatedUser.Username,
 		&updatedUser.FirstName,

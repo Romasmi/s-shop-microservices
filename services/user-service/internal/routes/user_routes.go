@@ -19,9 +19,9 @@ func RegisterUserRoutes(r *mux.Router, db *pgxpool.Pool, cfg *config.Config) {
 
 	r.HandleFunc("/user", userHandler.CreateUserHandler).Methods(http.MethodPost)
 
-	authR := r.PathPrefix("/user/{userId}").Subrouter()
+	authR := r.PathPrefix("/user").Subrouter()
 	authR.Use(middleware.AuthMiddleware)
-	authR.HandleFunc("", userHandler.GetUserHandler).Methods(http.MethodGet)
-	authR.HandleFunc("", userHandler.UpdateUserHandler).Methods(http.MethodPut)
-	authR.HandleFunc("", userHandler.DeleteUserHandler).Methods(http.MethodDelete)
+	authR.HandleFunc("/{userId}", userHandler.GetUserHandler).Methods(http.MethodGet)
+	authR.HandleFunc("/{userId}", userHandler.UpdateUserHandler).Methods(http.MethodPut)
+	authR.HandleFunc("/{userId}", userHandler.DeleteUserHandler).Methods(http.MethodDelete)
 }
