@@ -46,10 +46,10 @@ data:
           },
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
           "targets": [
-            { "expr": "histogram_quantile(0.50, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{service=\"api\", kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (p50)" },
-            { "expr": "histogram_quantile(0.95, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{service=\"api\", kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (p95)" },
-            { "expr": "histogram_quantile(0.99, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{service=\"api\", kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (p99)" },
-            { "expr": "histogram_quantile(1.0, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{service=\"api\", kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (max)" }
+            { "expr": "histogram_quantile(0.50, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (p50)" },
+            { "expr": "histogram_quantile(0.95, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (p95)" },
+            { "expr": "histogram_quantile(0.99, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (p99)" },
+            { "expr": "histogram_quantile(1.0, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (max)" }
           ]
         },
         {
@@ -61,7 +61,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
           "targets": [
-            { "expr": "sum by (method, path) (rate(http_requests_total{service=\"api\", kubernetes_namespace=\"s-shop-system\"}[5m]))", "legendFormat": "{{method}} {{path}}" }
+            { "expr": "sum by (method, path) (rate(http_requests_total{kubernetes_namespace=\"s-shop-system\"}[5m]))", "legendFormat": "{{method}} {{path}}" }
           ]
         },
         {
@@ -73,7 +73,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 24, "x": 0, "y": 9 },
           "targets": [
-            { "expr": "(sum by (method, path) (rate(http_requests_total{status=~\"5..\", service=\"api\", kubernetes_namespace=\"s-shop-system\"}[5m])) or (sum by (method, path) (rate(http_requests_total{service=\"api\", kubernetes_namespace=\"s-shop-system\"}[5m])) * 0)) / sum by (method, path) (rate(http_requests_total{service=\"api\", kubernetes_namespace=\"s-shop-system\"}[5m]))", "legendFormat": "{{method}} {{path}}" }
+            { "expr": "(sum by (method, path) (rate(http_requests_total{status=~\"5..\", kubernetes_namespace=\"s-shop-system\"}[5m])) or (sum by (method, path) (rate(http_requests_total{kubernetes_namespace=\"s-shop-system\"}[5m])) * 0)) / sum by (method, path) (rate(http_requests_total{kubernetes_namespace=\"s-shop-system\"}[5m]))", "legendFormat": "{{method}} {{path}}" }
           ]
         },
         {
@@ -91,10 +91,10 @@ data:
           },
           "gridPos": { "h": 8, "w": 8, "x": 0, "y": 18 },
           "targets": [
-            { "expr": "histogram_quantile(0.50, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{namespace=\"s-shop-system\"}[5m])) by (le))", "legendFormat": "p50" },
-            { "expr": "histogram_quantile(0.95, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{namespace=\"s-shop-system\"}[5m])) by (le))", "legendFormat": "p95" },
-            { "expr": "histogram_quantile(0.99, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{namespace=\"s-shop-system\"}[5m])) by (le))", "legendFormat": "p99" },
-            { "expr": "histogram_quantile(1.0, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{namespace=\"s-shop-system\"}[5m])) by (le))", "legendFormat": "max" }
+            { "expr": "histogram_quantile(0.50, sum(rate(traefik_entrypoint_request_duration_seconds_bucket{entrypoint=\"web\"}[5m])) by (le))", "legendFormat": "p50" },
+            { "expr": "histogram_quantile(0.95, sum(rate(traefik_entrypoint_request_duration_seconds_bucket{entrypoint=\"web\"}[5m])) by (le))", "legendFormat": "p95" },
+            { "expr": "histogram_quantile(0.99, sum(rate(traefik_entrypoint_request_duration_seconds_bucket{entrypoint=\"web\"}[5m])) by (le))", "legendFormat": "p99" },
+            { "expr": "histogram_quantile(1.0, sum(rate(traefik_entrypoint_request_duration_seconds_bucket{entrypoint=\"web\"}[5m])) by (le))", "legendFormat": "max" }
           ]
         },
         {
@@ -106,7 +106,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 8, "x": 8, "y": 18 },
           "targets": [
-            { "expr": "sum(rate(nginx_ingress_controller_requests{namespace=\"s-shop-system\"}[5m]))", "legendFormat": "total rps" }
+            { "expr": "sum(rate(traefik_entrypoint_requests_total{entrypoint=\"web\"}[5m]))", "legendFormat": "total rps" }
           ]
         },
         {
@@ -118,7 +118,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 8, "x": 16, "y": 18 },
           "targets": [
-            { "expr": "(sum(rate(nginx_ingress_controller_requests{status=~\"5..\", namespace=\"s-shop-system\"}[5m])) or vector(0)) / sum(rate(nginx_ingress_controller_requests{namespace=\"s-shop-system\"}[5m]))", "legendFormat": "error rate" }
+            { "expr": "(sum(rate(traefik_entrypoint_requests_total{entrypoint=\"web\", protocol=\"http\", code=~\"5..\"}[5m])) or vector(0)) / sum(rate(traefik_entrypoint_requests_total{entrypoint=\"web\"}[5m]))", "legendFormat": "error rate" }
           ]
         },
         {
@@ -136,7 +136,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 27 },
           "targets": [
-            { "expr": "sum(container_memory_working_set_bytes{pod=~\"api-.*\", namespace=\"s-shop-system\"}) by (pod)", "legendFormat": "{{pod}}" }
+            { "expr": "sum(container_memory_working_set_bytes{pod=~\"(user|auth)-service-.*\", namespace=\"s-shop-system\"}) by (pod)", "legendFormat": "{{pod}}" }
           ]
         },
         {
@@ -148,7 +148,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 27 },
           "targets": [
-            { "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"api-.*\", namespace=\"s-shop-system\"}[5m])) by (pod)", "legendFormat": "{{pod}}" }
+            { "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"(user|auth)-service-.*\", namespace=\"s-shop-system\"}[5m])) by (pod)", "legendFormat": "{{pod}}" }
           ]
         },
         {
@@ -166,7 +166,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 8, "x": 0, "y": 36 },
           "targets": [
-            { "expr": "pg_stat_activity_count{datname=\"social_network\"}", "legendFormat": "connections" }
+            { "expr": "pg_stat_activity_count{datname=~\"(user|auth)_service\"}", "legendFormat": "{{datname}} connections" }
           ]
         },
         {
@@ -178,8 +178,8 @@ data:
           },
           "gridPos": { "h": 8, "w": 8, "x": 8, "y": 36 },
           "targets": [
-            { "expr": "sum(rate(pg_stat_database_xact_commit{datname=\"social_network\"}[5m]))", "legendFormat": "commits" },
-            { "expr": "sum(rate(pg_stat_database_xact_rollback{datname=\"social_network\"}[5m]))", "legendFormat": "rollbacks" }
+            { "expr": "sum by (datname) (rate(pg_stat_database_xact_commit{datname=~\"(user|auth)_service\"}[5m]))", "legendFormat": "{{datname}} commits" },
+            { "expr": "sum by (datname) (rate(pg_stat_database_xact_rollback{datname=~\"(user|auth)_service\"}[5m]))", "legendFormat": "{{datname}} rollbacks" }
           ]
         },
         {
@@ -191,7 +191,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 8, "x": 16, "y": 36 },
           "targets": [
-            { "expr": "pg_database_size_bytes{datname=\"social_network\"}", "legendFormat": "{{datname}}" }
+            { "expr": "pg_database_size_bytes{datname=~\"(user|auth)_service\"}", "legendFormat": "{{datname}}" }
           ]
         }
       ],

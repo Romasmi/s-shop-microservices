@@ -21,6 +21,8 @@ spec:
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
+                name: shared-config
+            - configMapRef:
                 name: user-config
             - secretRef:
                 name: user-secret
@@ -38,10 +40,16 @@ spec:
             httpGet:
               path: /health
               port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /health
               port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 5
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -66,6 +74,8 @@ spec:
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
+                name: shared-config
+            - configMapRef:
                 name: auth-config
             - secretRef:
                 name: auth-secret
@@ -83,7 +93,13 @@ spec:
             httpGet:
               path: /health
               port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /health
               port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 5

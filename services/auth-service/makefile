@@ -7,3 +7,9 @@ docker-build:
 
 docker-push:
 	docker push romasmi/auth-service:latest
+
+kube-restart:
+	kubectl rollout restart deployment/auth-service -n s-shop-system
+
+kube-status:
+	kubectl rollout status deployment/auth-service -n s-shop-system

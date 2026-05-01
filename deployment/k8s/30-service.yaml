@@ -5,19 +5,22 @@ metadata:
   namespace: s-shop-system
   labels:
     app: user-service
+    app.kubernetes.io/name: user-service
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: s-shop-system
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "8000"
     prometheus.io/path: "/metrics"
 spec:
+  type: ClusterIP
   selector:
     app: user-service
   ports:
-    - protocol: TCP
+    - name: web
       port: 8000
-      targetPort: 8000
-      name: web
-  type: ClusterIP
+      targetPort: web
+
 ---
 apiVersion: v1
 kind: Service
@@ -26,16 +29,18 @@ metadata:
   namespace: s-shop-system
   labels:
     app: auth-service
+    app.kubernetes.io/name: auth-service
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: s-shop-system
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "8000"
     prometheus.io/path: "/metrics"
 spec:
+  type: ClusterIP
   selector:
     app: auth-service
   ports:
-    - protocol: TCP
+    - name: web
       port: 8000
-      targetPort: 8000
-      name: web
-  type: ClusterIP
+      targetPort: web

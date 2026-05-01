@@ -18,3 +18,8 @@ make install-traefik
 make forward-traefik # expose it to get locally http://localhost:9000/
 ```
 
+
+# Refresh container in pod
+```shell
+kubectl rollout restart deployment user-service -n s-shop-system
+```

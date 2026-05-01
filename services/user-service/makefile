@@ -7,3 +7,9 @@ docker-build:
 
 docker-push:
 	docker push romasmi/s-shop-system:latest
+
+kube-restart:
+	kubectl rollout restart deployment/user-service -n s-shop-system
+
+kube-status:
+	kubectl rollout status deployment/user-service -n s-shop-system
