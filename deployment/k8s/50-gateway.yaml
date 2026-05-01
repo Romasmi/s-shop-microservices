@@ -81,6 +81,13 @@ spec:
           port: 8000
 
     - kind: Rule
+      match: Path(`/user`) && Method(`POST`)
+      priority: 300
+      services:
+        - name: user-service
+          port: 8000
+
+    - kind: Rule
       match: PathPrefix(`/user`)
       priority: 200
       middlewares:
