@@ -1,0 +1,40 @@
+@startuml
+actor Client
+participant "API Gateway (Traefik)" as Gateway
+participant "Auth Service" as AuthService
+database "Auth DB" as DB
+
+Client -> Gateway: POST /auth/login\n{ "login": "...", "password": "..." }
+activate Gateway
+
+Gateway -> AuthService: POST /auth/login\n{ "login": "...", "password": "..." }
+activate AuthService
+
+AuthService -> DB: Get user by login
+activate DB
+DB --> AuthService: User data (with password hash)
+deactivate DB
+
+AuthService -> AuthService: Compare password hash
+
+alt Success
+    AuthService -> AuthService: Generate JWT Token
+    AuthService -> DB: Log LOGIN_SUCCESS
+    activate DB
+    DB --> AuthService: OK
+    deactivate DB
+    AuthService --> Gateway: 200 OK\n{ "token": "<jwt_token>" }
+else Invalid Credentials
+    AuthService -> DB: Log LOGIN_FAILED
+    activate DB
+    DB --> AuthService: OK
+    deactivate DB
+    AuthService --> Gateway: 401 Unauthorized
+end
+
+deactivate AuthService
+
+Gateway --> Client: Response (200 OK or 401 Unauthorized)
+deactivate Gateway
+
+@enduml

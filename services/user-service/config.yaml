@@ -1,0 +1,13 @@
+server:
+  port: 8000
+auth_service_url: "http://auth-service.s-shop-system.svc.cluster.local:8000"
+database:
+  host: postgresql
+  port: "5432"
+  name: user_service
+  user: user
+  password: password
+  maxConnections: 100
+  minConnection: 2
+  maxConnectionLifetime: 60 # seconds
+  maxConnectionIdleTime: 1 # minutes
