@@ -129,3 +129,6 @@ help:
 	@echo "  2. make run (in another terminal)"
 	@echo "  3. Access API: http://arch.homework:8080/user"
 	@echo "  4. Access Dashboard: http://arch.homework:8080/dashboard/"
+
+draw-puml:
+	plantuml -tsvg ./docs/auth/*.puml
