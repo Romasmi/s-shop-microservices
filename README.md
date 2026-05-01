@@ -56,5 +56,5 @@ k6 run load_testing/users.js
 
 ## Postman tests
 ```shell
-newman run docs/arch_homework.postman_collection.json --verbose
+newman run docs/postman.json --verbose
 ```
