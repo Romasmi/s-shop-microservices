@@ -20,7 +20,7 @@ import (
 func main() {
 	basePath := os.Getenv("APP_BASE_PATH")
 	if basePath == "" {
-		basePath = "." // current directory
+		basePath = "."
 	}
 
 	appInstance, err := app.NewApp(basePath)
