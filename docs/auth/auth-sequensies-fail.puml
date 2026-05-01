@@ -1,0 +1,42 @@
+@startuml
+actor Client
+participant "API Gateway (Traefik)" as Gateway
+participant "Auth Service" as AuthService
+participant "User Service" as UserService
+
+== Case 1: Invalid/Missing Token ==
+
+Client -> Gateway: GET /user/{userId}\nAuthorization: Bearer <invalid_token>
+activate Gateway
+
+Gateway -> AuthService: GET /auth\nAuthorization: Bearer <invalid_token>
+activate AuthService
+AuthService -> AuthService: Validate JWT Token
+AuthService --> Gateway: 401 Unauthorized
+deactivate AuthService
+
+Gateway --> Client: 401 Unauthorized
+deactivate Gateway
+
+== Case 2: Mismatched User ID (Authorization Failure) ==
+
+Client -> Gateway: GET /user/{userId_A}\nAuthorization: Bearer <token_for_user_B>
+activate Gateway
+
+Gateway -> AuthService: GET /auth\nAuthorization: Bearer <token_for_user_B>
+activate AuthService
+AuthService -> AuthService: Validate JWT Token
+AuthService --> Gateway: 200 OK\nX-Auth-User-ID: {userId_B}
+deactivate AuthService
+
+Gateway -> UserService: GET /user/{userId_A}\nX-Auth-User-ID: {userId_B}
+activate UserService
+UserService -> UserService: Check X-Auth-User-ID == userId_A
+note right: userId_B != userId_A
+UserService --> Gateway: 403 Forbidden
+deactivate UserService
+
+Gateway --> Client: 403 Forbidden
+deactivate Gateway
+
+@enduml
