@@ -1,5 +1,5 @@
 persistence:
-  enabled: true
+  enabled: false # true for prod
   size: 5Gi
 
 adminPassword: admin

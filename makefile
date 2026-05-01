@@ -90,6 +90,7 @@ clean:
 	kubectl delete -f ./deployment/k8s --ignore-not-found=true
 	helm uninstall traefik -n traefik --ignore-not-found
 	helm uninstall postgresql -n s-shop-system --ignore-not-found
+	helm uninstall prometheus -n s-shop-system --ignore-not-found
 	helm uninstall grafana -n s-shop-system --ignore-not-found
 	kubectl delete namespace traefik --ignore-not-found=true
 	kubectl delete namespace s-shop-system --ignore-not-found=true
