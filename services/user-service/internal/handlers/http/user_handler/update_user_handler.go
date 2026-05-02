@@ -7,9 +7,9 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/Romasmi/s-shop-microservices/internal/domain/user"
-	"github.com/Romasmi/s-shop-microservices/internal/repository"
-	"github.com/Romasmi/s-shop-microservices/internal/utils/http_utils"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/domain/user"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/repository"
+	http2 "github.com/Romasmi/s-shop-microservices/user-service/internal/transport/http"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
@@ -19,13 +19,13 @@ func (h *UserHandler) UpdateUserHandler(w http.ResponseWriter, r *http.Request) 
 	userIdStr := vars["userId"]
 	userId, err := uuid.Parse(userIdStr)
 	if err != nil {
-		http_utils.JsonError(w, http.StatusBadRequest, fmt.Errorf("invalid user id"))
+		http2.JsonError(w, http.StatusBadRequest, fmt.Errorf("invalid user id"))
 		return
 	}
 
 	var payload user.User
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		http_utils.ErrorInvalidRequestBody(w, err)
+		http2.ErrorInvalidRequestBody(w, err)
 		return
 	}
 	payload.ID = userId
@@ -33,18 +33,18 @@ func (h *UserHandler) UpdateUserHandler(w http.ResponseWriter, r *http.Request) 
 	updatedUser, err := h.userService.UpdateUser(r.Context(), &payload)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
-			http_utils.JsonErrorNotFound(w)
+			http2.JsonErrorNotFound(w)
 			return
 		}
 		if errors.Is(err, repository.ErrDuplicate) {
-			http_utils.JsonError(w, http.StatusBadRequest, fmt.Errorf("user already exists"))
+			http2.JsonError(w, http.StatusBadRequest, fmt.Errorf("user already exists"))
 			return
 		}
 
 		slog.Error("error while user update", "error", err)
-		http_utils.JsonInternalServerError(w)
+		http2.JsonInternalServerError(w)
 		return
 	}
 
-	http_utils.SuccessJsonResponse(w, updatedUser)
+	http2.SuccessJsonResponse(w, updatedUser)
 }

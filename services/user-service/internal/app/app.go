@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/Romasmi/s-shop-microservices/internal/config"
-	"github.com/Romasmi/s-shop-microservices/internal/infra/database"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/config"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/infra/database"
 )
 
 type App struct {
