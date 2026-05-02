@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/Romasmi/s-shop-microservices/internal/config"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/config"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

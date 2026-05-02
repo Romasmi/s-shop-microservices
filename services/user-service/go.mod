@@ -1,4 +1,4 @@
-module github.com/Romasmi/s-shop-microservices
+module github.com/Romasmi/s-shop-microservices/user-service
 
 go 1.25.1
 
