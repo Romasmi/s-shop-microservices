@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Romasmi/s-shop-microservices/internal/domain/user"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/domain/user"
 	"github.com/google/uuid"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5"

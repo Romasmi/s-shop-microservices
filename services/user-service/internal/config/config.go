@@ -5,8 +5,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/Romasmi/s-shop-microservices/internal/utils/string_utils"
-
 	"github.com/spf13/viper"
 )
 
@@ -33,7 +31,7 @@ func bindEnvRecursive(viperInstance *viper.Viper, prefix string, val reflect.Val
 		field := val.Type().Field(i)
 		tag := field.Tag.Get("mapstructure")
 		if tag == "" {
-			tag = string_utils.FirstCharToLowerCase(field.Name)
+			tag = FirstCharToLowerCase(field.Name)
 		}
 
 		fieldPath := prefix
@@ -93,4 +91,9 @@ func LoadConfig(configPath string) (*Config, error) {
 	}
 	fmt.Println("cfg", cfg)
 	return &cfg, nil
+}
+
+func FirstCharToLowerCase(str string) string {
+	firstChar := str[:1]
+	return strings.ToLower(firstChar) + str[1:]
 }

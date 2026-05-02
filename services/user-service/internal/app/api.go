@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Romasmi/s-shop-microservices/internal/routes"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/routes"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )

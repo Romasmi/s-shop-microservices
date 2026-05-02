@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Romasmi/s-shop-microservices/internal/domain/user"
-	"github.com/Romasmi/s-shop-microservices/internal/repository"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/domain/user"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/repository"
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/google/uuid"
 )

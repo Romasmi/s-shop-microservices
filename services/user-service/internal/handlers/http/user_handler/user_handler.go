@@ -1,6 +1,6 @@
 package user_handler
 
-import "github.com/Romasmi/s-shop-microservices/internal/services"
+import "github.com/Romasmi/s-shop-microservices/user-service/internal/services"
 
 type UserHandler struct {
 	userService *services.UserService
