@@ -315,8 +315,8 @@ const file_billing_proto_rawDesc = "" +
 	"\n" +
 	"GetAccount\x12\x1a.billing.GetAccountRequest\x1a\x10.billing.Account\"3\x82\xd3\xe4\x93\x02-\x12+/billing-service/billing/accounts/{user_id}\x12n\n" +
 	"\x05TopUp\x12\x15.billing.TopUpRequest\x1a\x10.billing.Account\"<\x82\xd3\xe4\x93\x026:\x01*\"1/billing-service/billing/accounts/{user_id}/topup\x12\x80\x01\n" +
-	"\bWithdraw\x12\x18.billing.WithdrawRequest\x1a\x19.billing.WithdrawResponse\"?\x82\xd3\xe4\x93\x029:\x01*\"4/billing-service/billing/accounts/{user_id}/withdrawB\xa1\x01\n" +
-	"\vcom.billingB\fBillingProtoP\x01ZHgithub.com/Romasmi/s-shop-microservices/billing-service/internal/api;api\xa2\x02\x03BXX\xaa\x02\aBilling\xca\x02\aBilling\xe2\x02\x13Billing\\GPBMetadata\xea\x02\aBillingb\x06proto3"
+	"\bWithdraw\x12\x18.billing.WithdrawRequest\x1a\x19.billing.WithdrawResponse\"?\x82\xd3\xe4\x93\x029:\x01*\"4/billing-service/billing/accounts/{user_id}/withdrawB\x9c\x01\n" +
+	"\vcom.billingB\fBillingProtoP\x01ZCgithub.com/Romasmi/s-shop-microservices/billing-service/pkg/api;api\xa2\x02\x03BXX\xaa\x02\aBilling\xca\x02\aBilling\xe2\x02\x13Billing\\GPBMetadata\xea\x02\aBillingb\x06proto3"
 
 var (
 	file_billing_proto_rawDescOnce sync.Once

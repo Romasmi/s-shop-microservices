@@ -3,10 +3,10 @@ package grpc
 import (
 	"context"
 
-	api "github.com/Romasmi/s-shop-microservices/billing-service/internal/api"
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/domain/account"
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/usecase"
 	billinguc "github.com/Romasmi/s-shop-microservices/billing-service/internal/usecase/billing"
+	api "github.com/Romasmi/s-shop-microservices/billing-service/pkg/api"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

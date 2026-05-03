@@ -1,8 +1,8 @@
 package grpc
 
 import (
-	api "github.com/Romasmi/s-shop-microservices/billing-service/internal/api"
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/usecase"
+	api "github.com/Romasmi/s-shop-microservices/billing-service/pkg/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
