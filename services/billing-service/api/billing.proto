@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package billing;
 
-option go_package = "github.com/Romasmi/s-shop-microservices/billing-service/internal/api;api";
+option go_package = "github.com/Romasmi/s-shop-microservices/billing-service/pkg/api;api";
 
 import "google/api/annotations.proto";
 

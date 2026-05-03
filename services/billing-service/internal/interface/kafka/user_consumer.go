@@ -4,9 +4,9 @@ import (
 	"context"
 	"log/slog"
 
-	api "github.com/Romasmi/s-shop-microservices/billing-service/internal/api"
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/domain/account"
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/infrastructure/db/postgres"
+	api "github.com/Romasmi/s-shop-microservices/billing-service/pkg/api"
 	"github.com/google/uuid"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/protobuf/encoding/protojson"
