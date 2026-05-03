@@ -17,28 +17,3 @@ message UserCreated {
   User user = 3;
 }
 
-message OrderPlaced {
-  string event_id = 1;
-  google.protobuf.Timestamp occurred_at = 2;
-  
-  message Order {
-    string id = 1;
-    string user_id = 2;
-    int64 price = 3;
-    string status = 4;
-  }
-  Order order = 3;
-
-  message PaymentResult {
-    bool success = 1;
-    string reason = 2;
-    int64 account_balance_after = 3;
-  }
-  PaymentResult payment_result = 4;
-
-  message UserInfo {
-    string id = 1;
-    string email = 2;
-  }
-  UserInfo user = 5;
-}
