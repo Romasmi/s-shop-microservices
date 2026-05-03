@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Db             Database
 	Server         Server
+	Kafka          Kafka
 	AuthServiceURL string `mapstructure:"auth_service_url"`
 }
 
@@ -23,7 +24,13 @@ type Database struct {
 }
 
 type Server struct {
-	Port uint
+	Port     uint
+	GRPCPort uint `mapstructure:"grpc_port"`
+}
+
+type Kafka struct {
+	Brokers []string `mapstructure:"brokers"`
+	Topic   string   `mapstructure:"topic"`
 }
 
 func bindEnvRecursive(viperInstance *viper.Viper, prefix string, val reflect.Value) error {
