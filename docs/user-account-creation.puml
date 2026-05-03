@@ -1,0 +1,13 @@
+@startuml
+participant Client
+participant "user-service" as US
+participant Kafka
+participant "billing-service" as BS
+
+Client -> US: CreateUser
+US -> US: persist user
+US -> Kafka: user.created {full user}
+US --> Client: User response
+Kafka -> BS: consume user.created
+BS -> BS: create account (balance=0)
+@enduml
