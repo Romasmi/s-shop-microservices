@@ -1,0 +1,8 @@
+@startuml
+participant Client
+participant "billing-service" as BS
+
+Client -> BS: TopUp {user_id, amount}
+BS -> BS: increment balance
+BS --> Client: updated Account
+@enduml
