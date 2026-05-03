@@ -1,0 +1,29 @@
+@startuml
+participant Client
+participant "order-service" as OS
+participant "user-service" as US
+participant "billing-service" as BS
+participant Kafka
+participant "notification-service" as NS
+
+Client -> OS: PlaceOrder
+OS -> US: GetUser
+US --> OS: full User
+OS -> BS: Withdraw {amount, idempotency_key=orderId}
+
+alt success
+  BS --> OS: success=true, updated account
+  OS -> OS: persist order status=SUCCESS
+  OS -> Kafka: order.placed {order, payment, user}
+  OS --> Client: Order SUCCESS
+  Kafka -> NS: consume order.placed
+  NS -> NS: persist ORDER_SUCCESS, log INFO
+else failed
+  BS --> OS: success=false, reason=insufficient_funds
+  OS -> OS: persist order status=FAILED
+  OS -> Kafka: order.placed {order, payment, user}
+  OS --> Client: Order FAILED
+  Kafka -> NS: consume order.placed
+  NS -> NS: persist ORDER_FAILED, log INFO
+end
+@enduml
