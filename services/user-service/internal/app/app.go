@@ -8,12 +8,18 @@ import (
 
 	"github.com/Romasmi/s-shop-microservices/user-service/internal/config"
 	"github.com/Romasmi/s-shop-microservices/user-service/internal/infra/database"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/infra/kafka"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/repository"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/usecase"
+	useruc "github.com/Romasmi/s-shop-microservices/user-service/internal/usecase/user"
 )
 
 type App struct {
-	DbConn *database.Connection
-	Config *config.Config
-	server *http.Server
+	DbConn   *database.Connection
+	Config   *config.Config
+	Handlers map[usecase.UseCaseID]usecase.Handler
+	Producer *kafka.UserProducer
+	server   *http.Server
 }
 
 func (a *App) GetDB() *database.Connection {
@@ -42,7 +48,23 @@ func (a *App) init(configPath string) error {
 	}
 	a.DbConn = dbConn
 
+	a.Producer = kafka.NewUserProducer(a.Config.Kafka.Brokers, a.Config.Kafka.Topic)
+
+	userRepo := repository.CreateUserRepository(dbConn.DB)
+
+	a.Handlers = make(map[usecase.UseCaseID]usecase.Handler)
+	a.registerHandlers(userRepo)
+
 	return nil
+}
+
+func (a *App) registerHandlers(userRepo *repository.UserRepository) {
+	a.Handlers[usecase.UseCaseCreateUser] = usecase.NewHandler(useruc.NewCreateUserUseCase(userRepo, a.Producer, a.Config.AuthServiceURL))
+	a.Handlers[usecase.UseCaseGetUser] = usecase.NewHandler(useruc.NewGetUserUseCase(userRepo))
+}
+
+func (a *App) GetHandler(id usecase.UseCaseID) usecase.Handler {
+	return a.Handlers[id]
 }
 
 func (a *App) Shutdown(ctx context.Context) error {
@@ -53,6 +75,13 @@ func (a *App) Shutdown(ctx context.Context) error {
 		if err := a.server.Shutdown(ctx); err != nil {
 			shutdownErr = fmt.Errorf("server shutdown error: %w", err)
 			slog.Error("HTTP server shutdown error", "error", err)
+		}
+	}
+
+	if a.Producer != nil {
+		slog.Info("Closing Kafka producer...")
+		if err := a.Producer.Close(); err != nil {
+			slog.Error("Kafka producer close error", "error", err)
 		}
 	}
 
