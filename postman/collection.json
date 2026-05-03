@@ -1,0 +1,286 @@
+{
+	"info": {
+		"name": "S-Shop System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Create User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.environment.set(\"userId\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_user}}/user-service/users",
+					"host": [
+						"{{base_user}}"
+					],
+					"path": [
+						"user-service",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get Account (Initial)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 600);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_billing}}/billing-service/billing/accounts/{{userId}}",
+					"host": [
+						"{{base_billing}}"
+					],
+					"path": [
+						"billing-service",
+						"billing",
+						"accounts",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Top Up Account",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 1000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_billing}}/billing-service/billing/accounts/{{userId}}/topup",
+					"host": [
+						"{{base_billing}}"
+					],
+					"path": [
+						"billing-service",
+						"billing",
+						"accounts",
+						"{{userId}}",
+						"topup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Place Order (Success)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.environment.set(\"orderId\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_id\": \"{{userId}}\",\n    \"price\": 500\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_order}}/order-service/orders",
+					"host": [
+						"{{base_order}}"
+					],
+					"path": [
+						"order-service",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Get Account (After Order)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_billing}}/billing-service/billing/accounts/{{userId}}",
+					"host": [
+						"{{base_billing}}"
+					],
+					"path": [
+						"billing-service",
+						"billing",
+						"accounts",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. Get Notifications (Success)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 600);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_notification}}/notification-service/notifications/messages?user_id={{userId}}",
+					"host": [
+						"{{base_notification}}"
+					],
+					"path": [
+						"notification-service",
+						"notifications",
+						"messages"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "{{userId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. Place Order (Failed)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_id\": \"{{userId}}\",\n    \"price\": 10000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_order}}/order-service/orders",
+					"host": [
+						"{{base_order}}"
+					],
+					"path": [
+						"order-service",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. Get Account (After Failed Order)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_billing}}/billing-service/billing/accounts/{{userId}}",
+					"host": [
+						"{{base_billing}}"
+					],
+					"path": [
+						"billing-service",
+						"billing",
+						"accounts",
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "9. Get Notifications (Failed)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){}, 600);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_notification}}/notification-service/notifications/messages?user_id={{userId}}",
+					"host": [
+						"{{base_notification}}"
+					],
+					"path": [
+						"notification-service",
+						"notifications",
+						"messages"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "{{userId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

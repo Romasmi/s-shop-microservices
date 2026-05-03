@@ -5,9 +5,9 @@ import (
 	"log/slog"
 	"time"
 
-	billingapi "github.com/Romasmi/s-shop-microservices/billing-service/pkg/api"
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/domain/message"
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/infrastructure/db/postgres"
+	orderapi "github.com/Romasmi/s-shop-microservices/order-service/pkg/api"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -42,7 +42,7 @@ func (c *OrderConsumer) Start(ctx context.Context) {
 			continue
 		}
 
-		var event billingapi.OrderPlaced
+		var event orderapi.OrderPlaced
 		if err := protojson.Unmarshal(m.Value, &event); err != nil {
 			slog.Error("failed to unmarshal order.placed event", "error", err)
 			continue
