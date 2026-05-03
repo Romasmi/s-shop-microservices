@@ -82,82 +82,6 @@ func (x *UserCreated) GetUser() *UserCreated_User {
 	return nil
 }
 
-type OrderPlaced struct {
-	state         protoimpl.MessageState     `protogen:"open.v1"`
-	EventId       string                     `protobuf:"bytes,1,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
-	OccurredAt    *timestamppb.Timestamp     `protobuf:"bytes,2,opt,name=occurred_at,json=occurredAt,proto3" json:"occurred_at,omitempty"`
-	Order         *OrderPlaced_Order         `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
-	PaymentResult *OrderPlaced_PaymentResult `protobuf:"bytes,4,opt,name=payment_result,json=paymentResult,proto3" json:"payment_result,omitempty"`
-	User          *OrderPlaced_UserInfo      `protobuf:"bytes,5,opt,name=user,proto3" json:"user,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *OrderPlaced) Reset() {
-	*x = OrderPlaced{}
-	mi := &file_events_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *OrderPlaced) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*OrderPlaced) ProtoMessage() {}
-
-func (x *OrderPlaced) ProtoReflect() protoreflect.Message {
-	mi := &file_events_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OrderPlaced.ProtoReflect.Descriptor instead.
-func (*OrderPlaced) Descriptor() ([]byte, []int) {
-	return file_events_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *OrderPlaced) GetEventId() string {
-	if x != nil {
-		return x.EventId
-	}
-	return ""
-}
-
-func (x *OrderPlaced) GetOccurredAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.OccurredAt
-	}
-	return nil
-}
-
-func (x *OrderPlaced) GetOrder() *OrderPlaced_Order {
-	if x != nil {
-		return x.Order
-	}
-	return nil
-}
-
-func (x *OrderPlaced) GetPaymentResult() *OrderPlaced_PaymentResult {
-	if x != nil {
-		return x.PaymentResult
-	}
-	return nil
-}
-
-func (x *OrderPlaced) GetUser() *OrderPlaced_UserInfo {
-	if x != nil {
-		return x.User
-	}
-	return nil
-}
-
 type UserCreated_User struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -169,7 +93,7 @@ type UserCreated_User struct {
 
 func (x *UserCreated_User) Reset() {
 	*x = UserCreated_User{}
-	mi := &file_events_proto_msgTypes[2]
+	mi := &file_events_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -181,7 +105,7 @@ func (x *UserCreated_User) String() string {
 func (*UserCreated_User) ProtoMessage() {}
 
 func (x *UserCreated_User) ProtoReflect() protoreflect.Message {
-	mi := &file_events_proto_msgTypes[2]
+	mi := &file_events_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -218,186 +142,6 @@ func (x *UserCreated_User) GetEmail() string {
 	return ""
 }
 
-type OrderPlaced_Order struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Price         int64                  `protobuf:"varint,3,opt,name=price,proto3" json:"price,omitempty"`
-	Status        string                 `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *OrderPlaced_Order) Reset() {
-	*x = OrderPlaced_Order{}
-	mi := &file_events_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *OrderPlaced_Order) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*OrderPlaced_Order) ProtoMessage() {}
-
-func (x *OrderPlaced_Order) ProtoReflect() protoreflect.Message {
-	mi := &file_events_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OrderPlaced_Order.ProtoReflect.Descriptor instead.
-func (*OrderPlaced_Order) Descriptor() ([]byte, []int) {
-	return file_events_proto_rawDescGZIP(), []int{1, 0}
-}
-
-func (x *OrderPlaced_Order) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *OrderPlaced_Order) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-func (x *OrderPlaced_Order) GetPrice() int64 {
-	if x != nil {
-		return x.Price
-	}
-	return 0
-}
-
-func (x *OrderPlaced_Order) GetStatus() string {
-	if x != nil {
-		return x.Status
-	}
-	return ""
-}
-
-type OrderPlaced_PaymentResult struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	Success             bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Reason              string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
-	AccountBalanceAfter int64                  `protobuf:"varint,3,opt,name=account_balance_after,json=accountBalanceAfter,proto3" json:"account_balance_after,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
-}
-
-func (x *OrderPlaced_PaymentResult) Reset() {
-	*x = OrderPlaced_PaymentResult{}
-	mi := &file_events_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *OrderPlaced_PaymentResult) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*OrderPlaced_PaymentResult) ProtoMessage() {}
-
-func (x *OrderPlaced_PaymentResult) ProtoReflect() protoreflect.Message {
-	mi := &file_events_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OrderPlaced_PaymentResult.ProtoReflect.Descriptor instead.
-func (*OrderPlaced_PaymentResult) Descriptor() ([]byte, []int) {
-	return file_events_proto_rawDescGZIP(), []int{1, 1}
-}
-
-func (x *OrderPlaced_PaymentResult) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *OrderPlaced_PaymentResult) GetReason() string {
-	if x != nil {
-		return x.Reason
-	}
-	return ""
-}
-
-func (x *OrderPlaced_PaymentResult) GetAccountBalanceAfter() int64 {
-	if x != nil {
-		return x.AccountBalanceAfter
-	}
-	return 0
-}
-
-type OrderPlaced_UserInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *OrderPlaced_UserInfo) Reset() {
-	*x = OrderPlaced_UserInfo{}
-	mi := &file_events_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *OrderPlaced_UserInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*OrderPlaced_UserInfo) ProtoMessage() {}
-
-func (x *OrderPlaced_UserInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_events_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use OrderPlaced_UserInfo.ProtoReflect.Descriptor instead.
-func (*OrderPlaced_UserInfo) Descriptor() ([]byte, []int) {
-	return file_events_proto_rawDescGZIP(), []int{1, 2}
-}
-
-func (x *OrderPlaced_UserInfo) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *OrderPlaced_UserInfo) GetEmail() string {
-	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
 var File_events_proto protoreflect.FileDescriptor
 
 const file_events_proto_rawDesc = "" +
@@ -411,26 +155,7 @@ const file_events_proto_rawDesc = "" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05email\"\x9e\x04\n" +
-	"\vOrderPlaced\x12\x19\n" +
-	"\bevent_id\x18\x01 \x01(\tR\aeventId\x12;\n" +
-	"\voccurred_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"occurredAt\x120\n" +
-	"\x05order\x18\x03 \x01(\v2\x1a.billing.OrderPlaced.OrderR\x05order\x12I\n" +
-	"\x0epayment_result\x18\x04 \x01(\v2\".billing.OrderPlaced.PaymentResultR\rpaymentResult\x121\n" +
-	"\x04user\x18\x05 \x01(\v2\x1d.billing.OrderPlaced.UserInfoR\x04user\x1a^\n" +
-	"\x05Order\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x14\n" +
-	"\x05price\x18\x03 \x01(\x03R\x05price\x12\x16\n" +
-	"\x06status\x18\x04 \x01(\tR\x06status\x1au\n" +
-	"\rPaymentResult\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x16\n" +
-	"\x06reason\x18\x02 \x01(\tR\x06reason\x122\n" +
-	"\x15account_balance_after\x18\x03 \x01(\x03R\x13accountBalanceAfter\x1a0\n" +
-	"\bUserInfo\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05emailB\x9b\x01\n" +
+	"\x05email\x18\x03 \x01(\tR\x05emailB\x9b\x01\n" +
 	"\vcom.billingB\vEventsProtoP\x01ZCgithub.com/Romasmi/s-shop-microservices/billing-service/pkg/api;api\xa2\x02\x03BXX\xaa\x02\aBilling\xca\x02\aBilling\xe2\x02\x13Billing\\GPBMetadata\xea\x02\aBillingb\x06proto3"
 
 var (
@@ -445,28 +170,20 @@ func file_events_proto_rawDescGZIP() []byte {
 	return file_events_proto_rawDescData
 }
 
-var file_events_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_events_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_events_proto_goTypes = []any{
-	(*UserCreated)(nil),               // 0: billing.UserCreated
-	(*OrderPlaced)(nil),               // 1: billing.OrderPlaced
-	(*UserCreated_User)(nil),          // 2: billing.UserCreated.User
-	(*OrderPlaced_Order)(nil),         // 3: billing.OrderPlaced.Order
-	(*OrderPlaced_PaymentResult)(nil), // 4: billing.OrderPlaced.PaymentResult
-	(*OrderPlaced_UserInfo)(nil),      // 5: billing.OrderPlaced.UserInfo
-	(*timestamppb.Timestamp)(nil),     // 6: google.protobuf.Timestamp
+	(*UserCreated)(nil),           // 0: billing.UserCreated
+	(*UserCreated_User)(nil),      // 1: billing.UserCreated.User
+	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
 }
 var file_events_proto_depIdxs = []int32{
-	6, // 0: billing.UserCreated.occurred_at:type_name -> google.protobuf.Timestamp
-	2, // 1: billing.UserCreated.user:type_name -> billing.UserCreated.User
-	6, // 2: billing.OrderPlaced.occurred_at:type_name -> google.protobuf.Timestamp
-	3, // 3: billing.OrderPlaced.order:type_name -> billing.OrderPlaced.Order
-	4, // 4: billing.OrderPlaced.payment_result:type_name -> billing.OrderPlaced.PaymentResult
-	5, // 5: billing.OrderPlaced.user:type_name -> billing.OrderPlaced.UserInfo
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	2, // 0: billing.UserCreated.occurred_at:type_name -> google.protobuf.Timestamp
+	1, // 1: billing.UserCreated.user:type_name -> billing.UserCreated.User
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_events_proto_init() }
@@ -480,7 +197,7 @@ func file_events_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_events_proto_rawDesc), len(file_events_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

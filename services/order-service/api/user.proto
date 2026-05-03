@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/Romasmi/s-shop-microservices/order-service/pkg/api;api";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/user-service/users"
+      body: "*"
+    };
+  }
+  rpc GetUser(GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/user-service/users/{id}"
+    };
+  }
+}
+
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string phone = 6;
+  string password = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string email = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string phone = 5;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
