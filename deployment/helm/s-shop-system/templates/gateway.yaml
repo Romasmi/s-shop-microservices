@@ -2,10 +2,10 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: user-auth
-  namespace: s-shop-system
+  namespace: {{ .Values.global.namespace }}
 spec:
   forwardAuth:
-    address: http://auth-service.s-shop-system.svc.cluster.local:8000/auth
+    address: http://auth-service.{{ .Values.global.namespace }}.svc.cluster.local:8000/auth
     trustForwardHeader: true
     authResponseHeaders:
       - X-Auth-User-ID
@@ -16,17 +16,17 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: internal-auth
-  namespace: s-shop-system
+  namespace: {{ .Values.global.namespace }}
 spec:
   basicAuth:
-    secret: internal-auth-basic-access
+    secret: {{ .Values.traefik.basicAuth.name }}
 
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: strip-auth-prefix
-  namespace: s-shop-system
+  namespace: {{ .Values.global.namespace }}
 spec:
   stripPrefix:
     prefixes:
@@ -37,7 +37,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: strip-user-prefix
-  namespace: s-shop-system
+  namespace: {{ .Values.global.namespace }}
 spec:
   stripPrefix:
     prefixes:
@@ -58,7 +58,7 @@ spec:
       priority: 1000
       middlewares:
         - name: internal-auth
-          namespace: s-shop-system
+          namespace: {{ .Values.global.namespace }}
       services:
         - name: api@internal
           kind: TraefikService
@@ -68,7 +68,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: public-api
-  namespace: s-shop-system
+  namespace: {{ .Values.global.namespace }}
 spec:
   entryPoints:
     - web
@@ -97,7 +97,7 @@ spec:
           port: 8000
 
     - kind: Rule
-      match: PathPrefix(`/order-service`)
+      match: PathPrefix(`/order`)
       priority: 200
       middlewares:
         - name: user-auth
@@ -106,7 +106,7 @@ spec:
           port: 8000
 
     - kind: Rule
-      match: PathPrefix(`/billing-service`)
+      match: PathPrefix(`/billing`)
       priority: 200
       middlewares:
         - name: user-auth
@@ -115,7 +115,7 @@ spec:
           port: 8000
 
     - kind: Rule
-      match: PathPrefix(`/notification-service`)
+      match: PathPrefix(`/notification`)
       priority: 200
       middlewares:
         - name: user-auth
