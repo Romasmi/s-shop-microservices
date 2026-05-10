@@ -74,21 +74,21 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: PathPrefix(`/auth`)
+      match: PathPrefix("/user") && Method("POST")
+      priority: 1000
+      services:
+        - name: user-service
+          port: 8000
+
+    - kind: Rule
+      match: PathPrefix("/auth")
       priority: 200
       services:
         - name: auth-service
           port: 8000
 
     - kind: Rule
-      match: Path(`/user`) && Method(`POST`)
-      priority: 300
-      services:
-        - name: user-service
-          port: 8000
-
-    - kind: Rule
-      match: PathPrefix(`/user`)
+      match: PathPrefix("/user")
       priority: 200
       middlewares:
         - name: user-auth
@@ -97,7 +97,7 @@ spec:
           port: 8000
 
     - kind: Rule
-      match: PathPrefix(`/order`)
+      match: PathPrefix("/order")
       priority: 200
       middlewares:
         - name: user-auth
@@ -106,7 +106,7 @@ spec:
           port: 8000
 
     - kind: Rule
-      match: PathPrefix(`/billing`)
+      match: PathPrefix("/billing")
       priority: 200
       middlewares:
         - name: user-auth
@@ -115,7 +115,7 @@ spec:
           port: 8000
 
     - kind: Rule
-      match: PathPrefix(`/notification`)
+      match: PathPrefix("/notification")
       priority: 200
       middlewares:
         - name: user-auth
