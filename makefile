@@ -1,7 +1,7 @@
-.PHONY: up build deploy restart install-traefik install-db install-grafana hosts run wait-db wait-api clean redeploy status help prometheus-run grafana-run
+.PHONY: up build deploy restart install-traefik install-db install-kafka install-grafana hosts run wait-db wait-kafka wait-api clean redeploy status help prometheus-run grafana-run forward-kafka forward-db forward-traefik
 
 # Main target to start everything from scratch
-up: build deploy wait-api
+up: build deploy wait-db wait-kafka wait-api
 
 # Build Docker images and load them into minikube
 build:
@@ -18,12 +18,15 @@ docker-push:
 	$(MAKE) -C ./services/order-service docker-push
 	$(MAKE) -C ./services/billing-service docker-push
 
-deploy: install-traefik install-db install-prometheus install-grafana install-app
+deploy: install-traefik install-db install-kafka install-prometheus install-grafana install-app
 
 install-app:
 	helm upgrade --install s-shop-system ./deployment/helm/s-shop-system \
 		--namespace s-shop-system \
 		--create-namespace
+
+uninstall-app:
+	helm uninstall s-shop-system -n s-shop-system --ignore-not-found
 
 # Helm installations
 install-traefik:
@@ -52,6 +55,17 @@ db-connect:
 
 forward-db:
 	kubectl port-forward svc/postgresql 5432:5432 -n s-shop-system
+
+install-kafka:
+	helm repo add redpanda https://charts.redpanda.com
+	helm repo update redpanda
+	helm upgrade --install redpanda redpanda/redpanda \
+		--namespace s-shop-system \
+		--create-namespace \
+		--values deployment/helm/redpanda-values.yaml
+
+forward-kafka:
+	kubectl port-forward svc/kafka 9092:9092 -n s-shop-system
 
 install-prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -85,6 +99,10 @@ wait-db:
 	@echo "Waiting for PostgreSQL to be ready..."
 	kubectl wait --namespace s-shop-system --for=condition=ready pod -l app.kubernetes.io/name=postgresql --timeout=120s
 
+wait-kafka:
+	@echo "Waiting for Redpanda to be ready..."
+	kubectl wait --namespace s-shop-system --for=condition=ready pod -l app.kubernetes.io/name=redpanda --timeout=300s
+
 wait-api:
 	@echo "Waiting for API deployments to be ready..."
 	kubectl rollout status deployment/user-service -n s-shop-system --timeout=120s
@@ -109,6 +127,7 @@ clean:
 	helm uninstall s-shop-system -n s-shop-system --ignore-not-found
 	helm uninstall traefik -n traefik --ignore-not-found
 	helm uninstall postgresql -n s-shop-system --ignore-not-found
+	helm uninstall redpanda -n s-shop-system --ignore-not-found
 	helm uninstall prometheus -n s-shop-system --ignore-not-found
 	helm uninstall grafana -n s-shop-system --ignore-not-found
 	kubectl delete namespace traefik --ignore-not-found=true
@@ -116,8 +135,12 @@ clean:
 
 status:
 	@echo "\n--- Infrastructure ---"
+	@echo "Traefik:"
 	@kubectl get pods -n traefik
+	@echo "PostgreSQL:"
 	@kubectl get pods -n s-shop-system -l app.kubernetes.io/name=postgresql
+	@echo "Redpanda:"
+	@kubectl get pods -n s-shop-system -l app.kubernetes.io/name=redpanda
 	@echo "\n--- Application ---"
 	@kubectl get pods -n s-shop-system -l app=user-service
 	@kubectl get pods -n s-shop-system -l app=auth-service
@@ -149,6 +172,8 @@ help:
 	@echo "  make status      - Check deployment status"
 	@echo "  make clean       - Remove all resources"
 	@echo "  make install-app - Install application using Helm"
+	@echo "  make forward-kafka - Port-forward Kafka to localhost:9092"
+	@echo "  make forward-db    - Port-forward PostgreSQL to localhost:5432"
 	@echo ""
 	@echo "Quick Start:"
 	@echo "  1. make up"
