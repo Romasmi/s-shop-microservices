@@ -6,7 +6,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o api    ./cmd/api
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o worker ./cmd/worker
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o cli    ./cmd/cli
+#RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o cli    ./cmd/cli
 
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
@@ -19,7 +19,7 @@ RUN chown -R appuser:appgroup /app
 
 COPY --from=builder --chown=appuser:appgroup /app/api    .
 COPY --from=builder --chown=appuser:appgroup /app/worker .
-COPY --from=builder --chown=appuser:appgroup /app/cli    .
+# COPY --from=builder --chown=appuser:appgroup /app/cli    .
 COPY --from=builder --chown=appuser:appgroup /app/migrations ./migrations
 COPY --from=builder --chown=appuser:appgroup /app/config.yaml .
 USER appuser
