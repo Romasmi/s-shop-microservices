@@ -1,4 +1,4 @@
-.PHONY: up build deploy restart install-traefik install-db install-grafana apply hosts run wait-db wait-api clean redeploy status help prometheus-run grafana-run
+.PHONY: up build deploy restart install-traefik install-db install-grafana hosts run wait-db wait-api clean redeploy status help prometheus-run grafana-run
 
 # Main target to start everything from scratch
 up: build deploy wait-api
@@ -18,8 +18,7 @@ docker-push:
 	$(MAKE) -C ./services/order-service docker-push
 	$(MAKE) -C ./services/billing-service docker-push
 
-apply:
-	kubectl apply -R -f ./deployment/k8s/
+deploy: install-traefik install-db install-prometheus install-grafana install-app
 
 install-app:
 	helm upgrade --install s-shop-system ./deployment/helm/s-shop-system \
@@ -108,7 +107,7 @@ restart:
 	$(MAKE) wait-api
 
 clean:
-	kubectl delete -R -f ./deployment/k8s --ignore-not-found=true
+	helm uninstall s-shop-system -n s-shop-system --ignore-not-found
 	helm uninstall traefik -n traefik --ignore-not-found
 	helm uninstall postgresql -n s-shop-system --ignore-not-found
 	helm uninstall prometheus -n s-shop-system --ignore-not-found

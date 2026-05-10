@@ -17,7 +17,7 @@ make hosts
     ```shell
     make up
     ```
-    This command builds Docker images, installs PostgreSQL, Grafana, and Traefik via Helm, and applies all Kubernetes manifests from `deployment/k8s/`.
+    This command builds Docker images and installs all components (PostgreSQL, Grafana, Traefik, and the S-Shop system) via Helm.
 
 2.  **Start API Proxy**:
     ```shell
@@ -46,8 +46,7 @@ The API is exposed at `http://arch.homework:8080` (ensure `make up` added the en
 ## Project Structure
 
 - `services/`: Source code for microservices.
-- `deployment/k8s/`: Kubernetes manifests (ordered 00-70).
-- `deployment/helm/`: Helm values for infrastructure components.
+ - `deployment/helm/`: Helm charts and values for infrastructure and application.
 
 ## Load tests 
 ```shell

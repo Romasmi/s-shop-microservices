@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   labels:
     grafana_dashboard: "1"
+  name: s-shop-dashboard
+  namespace: {{ .Values.global.namespace }}
 data:
   dashboard.json: |
     {
@@ -44,10 +46,10 @@ data:
           },
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
           "targets": [
-            { "expr": "histogram_quantile(0.50, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (p50)" },
-            { "expr": "histogram_quantile(0.95, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (p95)" },
-            { "expr": "histogram_quantile(0.99, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (p99)" },
-            { "expr": "histogram_quantile(1.0, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"s-shop-system\"}[5m])))", "legendFormat": "{{method}} {{path}} (max)" }
+            { "expr": "histogram_quantile(0.50, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"{{ .Values.global.namespace }}\"}[5m])))", "legendFormat": "{{ "{{" }}method{{ "}}" }} {{ "{{" }}path{{ "}}" }} (p50)" },
+            { "expr": "histogram_quantile(0.95, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"{{ .Values.global.namespace }}\"}[5m])))", "legendFormat": "{{ "{{" }}method{{ "}}" }} {{ "{{" }}path{{ "}}" }} (p95)" },
+            { "expr": "histogram_quantile(0.99, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"{{ .Values.global.namespace }}\"}[5m])))", "legendFormat": "{{ "{{" }}method{{ "}}" }} {{ "{{" }}path{{ "}}" }} (p99)" },
+            { "expr": "histogram_quantile(1.0, sum by (le, method, path) (rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"{{ .Values.global.namespace }}\"}[5m])))", "legendFormat": "{{ "{{" }}method{{ "}}" }} {{ "{{" }}path{{ "}}" }} (max)" }
           ]
         },
         {
@@ -59,7 +61,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
           "targets": [
-            { "expr": "sum by (method, path) (rate(http_requests_total{kubernetes_namespace=\"s-shop-system\"}[5m]))", "legendFormat": "{{method}} {{path}}" }
+            { "expr": "sum by (method, path) (rate(http_requests_total{kubernetes_namespace=\"{{ .Values.global.namespace }}\"}[5m]))", "legendFormat": "{{ "{{" }}method{{ "}}" }} {{ "{{" }}path{{ "}}" }}" }
           ]
         },
         {
@@ -71,7 +73,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 24, "x": 0, "y": 9 },
           "targets": [
-            { "expr": "(sum by (method, path) (rate(http_requests_total{status=~\"5..\", kubernetes_namespace=\"s-shop-system\"}[5m])) or (sum by (method, path) (rate(http_requests_total{kubernetes_namespace=\"s-shop-system\"}[5m])) * 0)) / sum by (method, path) (rate(http_requests_total{kubernetes_namespace=\"s-shop-system\"}[5m]))", "legendFormat": "{{method}} {{path}}" }
+            { "expr": "(sum by (method, path) (rate(http_requests_total{status=~\"5..\", kubernetes_namespace=\"{{ .Values.global.namespace }}\"}[5m])) or (sum by (method, path) (rate(http_requests_total{kubernetes_namespace=\"{{ .Values.global.namespace }}\"}[5m])) * 0)) / sum by (method, path) (rate(http_requests_total{kubernetes_namespace=\"{{ .Values.global.namespace }}\"}[5m]))", "legendFormat": "{{ "{{" }}method{{ "}}" }} {{ "{{" }}path{{ "}}" }}" }
           ]
         },
         {
@@ -134,7 +136,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 12, "x": 0, "y": 27 },
           "targets": [
-            { "expr": "sum(container_memory_working_set_bytes{pod=~\"(user|auth|order|billing|notification)-service-.*\", namespace=\"s-shop-system\"}) by (pod)", "legendFormat": "{{pod}}" }
+            { "expr": "sum(container_memory_working_set_bytes{pod=~\"(user|auth|order|billing|notification)-service-.*\", namespace=\"{{ .Values.global.namespace }}\"}) by (pod)", "legendFormat": "{{ "{{" }}pod{{ "}}" }}" }
           ]
         },
         {
@@ -146,7 +148,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 12, "x": 12, "y": 27 },
           "targets": [
-            { "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"(user|auth|order|billing|notification)-service-.*\", namespace=\"s-shop-system\"}[5m])) by (pod)", "legendFormat": "{{pod}}" }
+            { "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"(user|auth|order|billing|notification)-service-.*\", namespace=\"{{ .Values.global.namespace }}\"}[5m])) by (pod)", "legendFormat": "{{ "{{" }}pod{{ "}}" }}" }
           ]
         },
         {
@@ -164,7 +166,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 8, "x": 0, "y": 36 },
           "targets": [
-            { "expr": "pg_stat_activity_count{datname=~\"(user|auth|order|billing|notification)_service\"}", "legendFormat": "{{datname}} connections" }
+            { "expr": "pg_stat_activity_count{datname=~\"(user|auth|order|billing|notification)_service\"}", "legendFormat": "{{ "{{" }}datname{{ "}}" }} connections" }
           ]
         },
         {
@@ -176,8 +178,8 @@ data:
           },
           "gridPos": { "h": 8, "w": 8, "x": 8, "y": 36 },
           "targets": [
-            { "expr": "sum by (datname) (rate(pg_stat_database_xact_commit{datname=~\"(user|auth|order|billing|notification)_service\"}[5m]))", "legendFormat": "{{datname}} commits" },
-            { "expr": "sum by (datname) (rate(pg_stat_database_xact_rollback{datname=~\"(user|auth|order|billing|notification)_service\"}[5m]))", "legendFormat": "{{datname}} rollbacks" }
+            { "expr": "sum by (datname) (rate(pg_stat_database_xact_commit{datname=~\"(user|auth|order|billing|notification)_service\"}[5m]))", "legendFormat": "{{ "{{" }}datname{{ "}}" }} commits" },
+            { "expr": "sum by (datname) (rate(pg_stat_database_xact_rollback{datname=~\"(user|auth|order|billing|notification)_service\"}[5m]))", "legendFormat": "{{ "{{" }}datname{{ "}}" }} rollbacks" }
           ]
         },
         {
@@ -189,7 +191,7 @@ data:
           },
           "gridPos": { "h": 8, "w": 8, "x": 16, "y": 36 },
           "targets": [
-            { "expr": "pg_database_size_bytes{datname=~\"(user|auth|order|billing|notification)_service\"}", "legendFormat": "{{datname}}" }
+            { "expr": "pg_database_size_bytes{datname=~\"(user|auth|order|billing|notification)_service\"}", "legendFormat": "{{ "{{" }}datname{{ "}}" }}" }
           ]
         }
       ],
