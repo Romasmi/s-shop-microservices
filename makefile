@@ -7,13 +7,24 @@ up: build deploy wait-api
 build:
 	$(MAKE) -C ./services/user-service docker-build
 	$(MAKE) -C ./services/auth-service docker-build
+	$(MAKE) -C ./services/notification-service docker-build
+	$(MAKE) -C ./services/order-service docker-build
+	$(MAKE) -C ./services/billing-service docker-build
 
 docker-push:
 	$(MAKE) -C ./services/user-service docker-push
 	$(MAKE) -C ./services/auth-service docker-push
+	$(MAKE) -C ./services/notification-service docker-push
+	$(MAKE) -C ./services/order-service docker-push
+	$(MAKE) -C ./services/billing-service docker-push
 
 apply:
-	kubectl apply -f ./deployment/k8s/
+	kubectl apply -R -f ./deployment/k8s/
+
+install-app:
+	helm upgrade --install s-shop-system ./deployment/helm/s-shop-system \
+		--namespace s-shop-system \
+		--create-namespace
 
 # Helm installations
 install-traefik:
@@ -80,14 +91,24 @@ wait-api:
 	@echo "Waiting for API deployments to be ready..."
 	kubectl rollout status deployment/user-service -n s-shop-system --timeout=120s
 	kubectl rollout status deployment/auth-service -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/notification-service-api -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/notification-service-worker -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/order-service -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/billing-service-api -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/billing-service-worker -n s-shop-system --timeout=120s
 
 restart:
 	kubectl rollout restart deployment/user-service -n s-shop-system
 	kubectl rollout restart deployment/auth-service -n s-shop-system
+	kubectl rollout restart deployment/notification-service-api -n s-shop-system
+	kubectl rollout restart deployment/notification-service-worker -n s-shop-system
+	kubectl rollout restart deployment/order-service -n s-shop-system
+	kubectl rollout restart deployment/billing-service-api -n s-shop-system
+	kubectl rollout restart deployment/billing-service-worker -n s-shop-system
 	$(MAKE) wait-api
 
 clean:
-	kubectl delete -f ./deployment/k8s --ignore-not-found=true
+	kubectl delete -R -f ./deployment/k8s --ignore-not-found=true
 	helm uninstall traefik -n traefik --ignore-not-found
 	helm uninstall postgresql -n s-shop-system --ignore-not-found
 	helm uninstall prometheus -n s-shop-system --ignore-not-found
@@ -102,6 +123,9 @@ status:
 	@echo "\n--- Application ---"
 	@kubectl get pods -n s-shop-system -l app=user-service
 	@kubectl get pods -n s-shop-system -l app=auth-service
+	@kubectl get pods -n s-shop-system -l app=notification-service
+	@kubectl get pods -n s-shop-system -l app=order-service
+	@kubectl get pods -n s-shop-system -l app=billing-service
 	@echo "\n--- Services ---"
 	@kubectl get svc -n s-shop-system
 	@kubectl get svc -n traefik
@@ -117,12 +141,16 @@ grafana-run:
 grafana-pass:
 	@kubectl get secret grafana -o jsonpath="{.data.admin-password}" -n s-shop-system | base64 --decode ; echo ""
 
+redeploy: build docker-push restart
+
 help:
 	@echo "Usage:"
 	@echo "  make up          - Build images and deploy everything (from scratch)"
+	@echo "  make redeploy    - Build, push and restart all services"
 	@echo "  make run         - Start minikube tunnel (required for access)"
 	@echo "  make status      - Check deployment status"
 	@echo "  make clean       - Remove all resources"
+	@echo "  make install-app - Install application using Helm"
 	@echo ""
 	@echo "Quick Start:"
 	@echo "  1. make up"

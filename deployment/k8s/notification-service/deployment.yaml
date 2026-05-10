@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service-api
+  namespace: s-shop-system
+  labels:
+    app: notification-service
+    component: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+      component: api
+  template:
+    metadata:
+      labels:
+        app: notification-service
+        component: api
+    spec:
+      containers:
+        - name: app
+          image: romasmi/notification-service:latest
+          imagePullPolicy: Always
+          command: ["./api"]
+          envFrom:
+            - configMapRef:
+                name: shared-config
+            - configMapRef:
+                name: notification-config
+            - secretRef:
+                name: notification-secret
+          ports:
+            - name: web
+              containerPort: 8000
+            - name: grpc
+              containerPort: 9000
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 100m
+            limits:
+              memory: 128Mi
+              cpu: 200m
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service-worker
+  namespace: s-shop-system
+  labels:
+    app: notification-service
+    component: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: notification-service
+        component: worker
+    spec:
+      containers:
+        - name: app
+          image: romasmi/notification-service:latest
+          imagePullPolicy: Always
+          command: ["./worker"]
+          envFrom:
+            - configMapRef:
+                name: shared-config
+            - configMapRef:
+                name: notification-config
+            - secretRef:
+                name: notification-secret
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 100m
+            limits:
+              memory: 128Mi
+              cpu: 200m
