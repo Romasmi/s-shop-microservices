@@ -18,3 +18,10 @@ kube-restart:
 
 kube-status:
 	kubectl rollout status deployment/user-service -n s-shop-system
+
+kube-logs:
+	kubectl logs deployment/user-service -n s-shop-system
+
+#  forward port outside
+kube-forward:
+	kubectl port-forward -n s-shop-system svc/user-service 8081:8000

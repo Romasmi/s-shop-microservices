@@ -9,18 +9,18 @@ import "google/api/annotations.proto";
 service BillingService {
   rpc GetAccount(GetAccountRequest) returns (Account) {
     option (google.api.http) = {
-      get: "/billing-service/billing/accounts/{user_id}"
+      get: "/billing/accounts/{user_id}"
     };
   }
   rpc TopUp(TopUpRequest) returns (Account) {
     option (google.api.http) = {
-      post: "/billing-service/billing/accounts/{user_id}/topup"
+      post: "/billing/accounts/{user_id}/topup"
       body: "*"
     };
   }
   rpc Withdraw(WithdrawRequest) returns (WithdrawResponse) {
     option (google.api.http) = {
-      post: "/billing-service/billing/accounts/{user_id}/withdraw"
+      post: "/billing/accounts/{user_id}/withdraw"
       body: "*"
     };
   }

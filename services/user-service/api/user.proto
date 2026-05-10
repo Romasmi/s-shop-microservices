@@ -10,13 +10,13 @@ import "google/protobuf/timestamp.proto";
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (User) {
     option (google.api.http) = {
-      post: "/user-service/users"
+      post: "/user"
       body: "*"
     };
   }
   rpc GetUser(GetUserRequest) returns (User) {
     option (google.api.http) = {
-      get: "/user-service/users/{id}"
+      get: "/user/{id}"
     };
   }
 }

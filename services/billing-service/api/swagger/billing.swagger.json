@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/billing-service/billing/accounts/{userId}": {
+    "/billing/accounts/{userId}": {
       "get": {
         "operationId": "BillingService_GetAccount",
         "responses": {
@@ -46,7 +46,7 @@
         ]
       }
     },
-    "/billing-service/billing/accounts/{userId}/topup": {
+    "/billing/accounts/{userId}/topup": {
       "post": {
         "operationId": "BillingService_TopUp",
         "responses": {
@@ -84,7 +84,7 @@
         ]
       }
     },
-    "/billing-service/billing/accounts/{userId}/withdraw": {
+    "/billing/accounts/{userId}/withdraw": {
       "post": {
         "operationId": "BillingService_Withdraw",
         "responses": {

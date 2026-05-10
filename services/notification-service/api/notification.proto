@@ -9,7 +9,7 @@ import "google/api/annotations.proto";
 service NotificationService {
   rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse) {
     option (google.api.http) = {
-      get: "/notification-service/notifications/messages"
+      get: "/notification/messages"
     };
   }
 }

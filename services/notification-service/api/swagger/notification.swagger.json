@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/notification-service/notifications/messages": {
+    "/notification/messages": {
       "get": {
         "operationId": "NotificationService_ListMessages",
         "responses": {

@@ -200,11 +200,11 @@ const file_order_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05price\x18\x02 \x01(\x03R\x05price\"!\n" +
 	"\x0fGetOrderRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id2\xbc\x01\n" +
-	"\fOrderService\x12V\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id2\x9e\x01\n" +
+	"\fOrderService\x12G\n" +
 	"\n" +
-	"PlaceOrder\x12\x18.order.PlaceOrderRequest\x1a\f.order.Order\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/order-service/orders\x12T\n" +
-	"\bGetOrder\x12\x16.order.GetOrderRequest\x1a\f.order.Order\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/order-service/orders/{id}B\x8e\x01\n" +
+	"PlaceOrder\x12\x18.order.PlaceOrderRequest\x1a\f.order.Order\"\x11\x82\xd3\xe4\x93\x02\v:\x01*\"\x06/order\x12E\n" +
+	"\bGetOrder\x12\x16.order.GetOrderRequest\x1a\f.order.Order\"\x13\x82\xd3\xe4\x93\x02\r\x12\v/order/{id}B\x8e\x01\n" +
 	"\tcom.orderB\n" +
 	"OrderProtoP\x01ZAgithub.com/Romasmi/s-shop-microservices/order-service/pkg/api;api\xa2\x02\x03OXX\xaa\x02\x05Order\xca\x02\x05Order\xe2\x02\x11Order\\GPBMetadata\xea\x02\x05Orderb\x06proto3"
 
