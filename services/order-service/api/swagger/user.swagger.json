@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/user-service/users": {
+    "/user": {
       "post": {
         "operationId": "UserService_CreateUser",
         "responses": {
@@ -48,7 +48,7 @@
         ]
       }
     },
-    "/user-service/users/{id}": {
+    "/user/{id}": {
       "get": {
         "operationId": "UserService_GetUser",
         "responses": {

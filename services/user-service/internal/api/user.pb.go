@@ -268,13 +268,15 @@ const file_user_proto_rawDesc = "" +
 	"\tlast_name\x18\x04 \x01(\tR\blastName\x12\x14\n" +
 	"\x05phone\x18\x05 \x01(\tR\x05phone\" \n" +
 	"\x0eGetUserRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id2\xaf\x01\n" +
-	"\vUserService\x12Q\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id2\x93\x01\n" +
+	"\vUserService\x12C\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\n" +
-	".user.User\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/user-service/users\x12M\n" +
+	".user.User\"\x10\x82\xd3\xe4\x93\x02\n" +
+	":\x01*\"\x05/user\x12?\n" +
 	"\aGetUser\x12\x14.user.GetUserRequest\x1a\n" +
-	".user.User\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/user-service/users/{id}B\x8c\x01\n" +
+	".user.User\"\x12\x82\xd3\xe4\x93\x02\f\x12\n" +
+	"/user/{id}B\x8c\x01\n" +
 	"\bcom.userB\tUserProtoP\x01ZEgithub.com/Romasmi/s-shop-microservices/user-service/internal/api;api\xa2\x02\x03UXX\xaa\x02\x04User\xca\x02\x04User\xe2\x02\x10User\\GPBMetadata\xea\x02\x04Userb\x06proto3"
 
 var (

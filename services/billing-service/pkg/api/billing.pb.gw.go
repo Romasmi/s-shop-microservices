@@ -176,7 +176,7 @@ func RegisterBillingServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/billing.BillingService/GetAccount", runtime.WithHTTPPathPattern("/billing-service/billing/accounts/{user_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/billing.BillingService/GetAccount", runtime.WithHTTPPathPattern("/billing/accounts/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -196,7 +196,7 @@ func RegisterBillingServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/billing.BillingService/TopUp", runtime.WithHTTPPathPattern("/billing-service/billing/accounts/{user_id}/topup"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/billing.BillingService/TopUp", runtime.WithHTTPPathPattern("/billing/accounts/{user_id}/topup"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -216,7 +216,7 @@ func RegisterBillingServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/billing.BillingService/Withdraw", runtime.WithHTTPPathPattern("/billing-service/billing/accounts/{user_id}/withdraw"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/billing.BillingService/Withdraw", runtime.WithHTTPPathPattern("/billing/accounts/{user_id}/withdraw"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -274,7 +274,7 @@ func RegisterBillingServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/billing.BillingService/GetAccount", runtime.WithHTTPPathPattern("/billing-service/billing/accounts/{user_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/billing.BillingService/GetAccount", runtime.WithHTTPPathPattern("/billing/accounts/{user_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -291,7 +291,7 @@ func RegisterBillingServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/billing.BillingService/TopUp", runtime.WithHTTPPathPattern("/billing-service/billing/accounts/{user_id}/topup"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/billing.BillingService/TopUp", runtime.WithHTTPPathPattern("/billing/accounts/{user_id}/topup"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -308,7 +308,7 @@ func RegisterBillingServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/billing.BillingService/Withdraw", runtime.WithHTTPPathPattern("/billing-service/billing/accounts/{user_id}/withdraw"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/billing.BillingService/Withdraw", runtime.WithHTTPPathPattern("/billing/accounts/{user_id}/withdraw"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -325,9 +325,9 @@ func RegisterBillingServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
-	pattern_BillingService_GetAccount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"billing-service", "billing", "accounts", "user_id"}, ""))
-	pattern_BillingService_TopUp_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"billing-service", "billing", "accounts", "user_id", "topup"}, ""))
-	pattern_BillingService_Withdraw_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"billing-service", "billing", "accounts", "user_id", "withdraw"}, ""))
+	pattern_BillingService_GetAccount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"billing", "accounts", "user_id"}, ""))
+	pattern_BillingService_TopUp_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"billing", "accounts", "user_id", "topup"}, ""))
+	pattern_BillingService_Withdraw_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"billing", "accounts", "user_id", "withdraw"}, ""))
 )
 
 var (

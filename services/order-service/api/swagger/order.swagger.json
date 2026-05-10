@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/order-service/orders": {
+    "/order": {
       "post": {
         "operationId": "OrderService_PlaceOrder",
         "responses": {
@@ -48,7 +48,7 @@
         ]
       }
     },
-    "/order-service/orders/{id}": {
+    "/order/{id}": {
       "get": {
         "operationId": "OrderService_GetOrder",
         "responses": {
