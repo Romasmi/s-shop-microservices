@@ -53,7 +53,6 @@ db-connect:
 forward-db:
 	kubectl port-forward svc/postgresql 5432:5432 -n s-shop-system
 
-
 install-prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	helm repo update prometheus-community
