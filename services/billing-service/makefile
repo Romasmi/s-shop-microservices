@@ -8,16 +8,12 @@ generate:
 build:
 	go build -o bin/api cmd/api/main.go
 	go build -o bin/worker cmd/worker/main.go
-	go build -o bin/cli cmd/cli/main.go
 
 run-api:
 	go run cmd/api/main.go
 
 run-worker:
 	go run cmd/worker/main.go
-
-run-cli:
-	go run cmd/cli/main.go
 
 compose-up:
 	docker-compose -f deployments/docker-compose.yaml up -d
@@ -39,7 +35,7 @@ docker-build:
 	fi
 
 docker-push:
-	docker push romasmi/my-app-image:latest
+	docker push romasmi/billing-service:latest
 
 kube-restart:
 	kubectl rollout restart deployment/billing-service -n s-shop-system

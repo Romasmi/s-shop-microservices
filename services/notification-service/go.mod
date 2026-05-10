@@ -3,7 +3,7 @@ module github.com/Romasmi/s-shop-microservices/notification-service
 go 1.25.1
 
 require (
-	github.com/Romasmi/s-shop-microservices/billing-service v0.0.0-00010101000000-000000000000
+	github.com/Romasmi/s-shop-microservices/order-service v0.0.0-00010101000000-000000000000
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0
 	github.com/jackc/pgx/v5 v5.8.0
@@ -47,3 +47,5 @@ require (
 )
 
 replace github.com/Romasmi/s-shop-microservices/billing-service => ../billing-service
+
+replace github.com/Romasmi/s-shop-microservices/order-service => ../order-service
