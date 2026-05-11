@@ -56,10 +56,15 @@ func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*or
 		return nil, err
 	}
 
-	orderID := uuid.New().String()
+	orderID := uuid.New()
+	userID, err := uuid.Parse(input.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user id: %w", err)
+	}
+
 	o := &order.Order{
 		ID:        orderID,
-		UserID:    input.UserID,
+		UserID:    userID,
 		Price:     input.Price,
 		Status:    "PENDING",
 		CreatedAt: time.Now(),
@@ -73,13 +78,18 @@ func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*or
 		ProductId: input.ProductID,
 		Count:     input.Count,
 	})
-	if err != nil {
-		return nil, fmt.Errorf("warehouse service error: %w", err)
-	}
-	if !warehouseResp.Success {
+	if err != nil || (warehouseResp != nil && !warehouseResp.Success) {
 		o.Status = "FAILED"
 		_ = uc.repo.CreateOrder(ctx, o)
-		return nil, fmt.Errorf("warehouse reservation failed: %s", warehouseResp.Error)
+		if err != nil {
+			return nil, fmt.Errorf("warehouse service error: %w", err)
+		}
+		reason := "warehouse reservation failed"
+		if warehouseResp != nil {
+			reason += ": " + warehouseResp.Error
+		}
+		uc.emitEvent(ctx, o, userResp, false, reason, 0)
+		return o, nil
 	}
 	reservationID := warehouseResp.ReservationId
 
@@ -87,12 +97,12 @@ func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*or
 	fromDate := time.Now().Add(24 * time.Hour)
 	toDate := fromDate.Add(2 * time.Hour)
 	deliveryResp, err := uc.deliveryClient.ReserveCourier(ctx, &deliveryapi.ReserveCourierRequest{
-		OrderId:  orderID,
+		OrderId:  orderID.String(),
 		FromDate: timestamppb.New(fromDate),
 		ToDate:   timestamppb.New(toDate),
 	})
 
-	if err != nil || !deliveryResp.Success {
+	if err != nil || (deliveryResp != nil && !deliveryResp.Success) {
 		// ROLLBACK Warehouse
 		_, _ = uc.warehouseClient.CancelReservation(ctx, &warehouseapi.CancelReservationRequest{
 			ReservationId: reservationID,
@@ -102,20 +112,25 @@ func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*or
 		if err != nil {
 			return nil, fmt.Errorf("delivery service error: %w", err)
 		}
-		return nil, fmt.Errorf("delivery reservation failed: %s", deliveryResp.Error)
+		reason := "delivery reservation failed"
+		if deliveryResp != nil {
+			reason += ": " + deliveryResp.Error
+		}
+		uc.emitEvent(ctx, o, userResp, false, reason, 0)
+		return o, nil
 	}
 
 	// 3. Billing Withdraw
 	withdrawResp, err := uc.billingClient.Withdraw(ctx, &billingapi.WithdrawRequest{
 		UserId:         input.UserID,
 		Amount:         input.Price,
-		IdempotencyKey: orderID,
+		IdempotencyKey: orderID.String(),
 	})
 
-	if err != nil || !withdrawResp.Success {
+	if err != nil || (withdrawResp != nil && !withdrawResp.Success) {
 		// ROLLBACK Delivery
 		_, _ = uc.deliveryClient.CancelCourier(ctx, &deliveryapi.CancelCourierRequest{
-			OrderId: orderID,
+			OrderId: orderID.String(),
 		})
 		// ROLLBACK Warehouse
 		_, _ = uc.warehouseClient.CancelReservation(ctx, &warehouseapi.CancelReservationRequest{
@@ -128,7 +143,12 @@ func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*or
 		if err != nil {
 			return nil, fmt.Errorf("billing service error: %w", err)
 		}
-		return nil, fmt.Errorf("billing failed: %s", withdrawResp.Reason)
+		reason := "billing failed"
+		if withdrawResp != nil {
+			reason += ": " + withdrawResp.Reason
+		}
+		uc.emitEvent(ctx, o, userResp, false, reason, 0)
+		return o, nil
 	}
 
 	// SAGA SUCCESS - Finalize
@@ -146,20 +166,25 @@ func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*or
 		return nil, fmt.Errorf("failed to persist order: %w", err)
 	}
 
-	// Emit order.placed
+	uc.emitEvent(ctx, o, userResp, true, "", withdrawResp.UpdatedAccount.Balance)
+
+	return o, nil
+}
+
+func (uc *PlaceOrderUseCase) emitEvent(ctx context.Context, o *order.Order, userResp *userapi.User, success bool, reason string, balanceAfter int64) {
 	event := &api.OrderPlaced{
 		EventId:    uuid.New().String(),
 		OccurredAt: timestamppb.New(time.Now()),
 		Order: &api.OrderPlaced_Order{
-			Id:     o.ID,
-			UserId: o.UserID,
+			Id:     o.ID.String(),
+			UserId: o.UserID.String(),
 			Price:  o.Price,
 			Status: o.Status,
 		},
 		PaymentResult: &api.OrderPlaced_PaymentResult{
-			Success:             withdrawResp.Success,
-			Reason:              withdrawResp.Reason,
-			AccountBalanceAfter: withdrawResp.UpdatedAccount.Balance,
+			Success:             success,
+			Reason:              reason,
+			AccountBalanceAfter: balanceAfter,
 		},
 		User: &api.OrderPlaced_UserInfo{
 			Id:    userResp.Id,
@@ -172,6 +197,4 @@ func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*or
 			fmt.Printf("failed to emit order.placed event: %v\n", err)
 		}
 	}
-
-	return o, nil
 }

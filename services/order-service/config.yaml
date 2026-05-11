@@ -6,6 +6,8 @@ kafka:
   topic: "order.placed"
 user_service_addr: "user-service.s-shop-system.svc.cluster.local:9000"
 billing_service_addr: "billing-service.s-shop-system.svc.cluster.local:9000"
+warehouse_service_addr: "warehouse-service.s-shop-system.svc.cluster.local:9000"
+delivery_service_addr: "delivery-service.s-shop-system.svc.cluster.local:9000"
 database:
   host: postgresql
   port: "5432"

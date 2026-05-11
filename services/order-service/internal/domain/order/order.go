@@ -1,10 +1,14 @@
 package order
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Order struct {
-	ID        string    `json:"id"`
-	UserID    string    `json:"user_id"`
+	ID        uuid.UUID `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
 	Price     int64     `json:"price"`
 	Status    string    `json:"status"`
 	UpdatedAt time.Time `json:"updated_at"`

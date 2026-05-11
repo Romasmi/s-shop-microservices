@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/domain/order"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -24,7 +25,7 @@ func (r *OrderRepository) CreateOrder(ctx context.Context, o *order.Order) error
 	return nil
 }
 
-func (r *OrderRepository) GetOrder(ctx context.Context, id string) (*order.Order, error) {
+func (r *OrderRepository) GetOrder(ctx context.Context, id uuid.UUID) (*order.Order, error) {
 	o := &order.Order{}
 	err := r.pool.QueryRow(ctx, "SELECT id, user_id, price, status, created_at, updated_at FROM orders WHERE id = $1", id).Scan(&o.ID, &o.UserID, &o.Price, &o.Status, &o.CreatedAt, &o.UpdatedAt)
 	if err != nil {
@@ -33,7 +34,7 @@ func (r *OrderRepository) GetOrder(ctx context.Context, id string) (*order.Order
 	return o, nil
 }
 
-func (r *OrderRepository) UpdateStatus(ctx context.Context, id string, status string) error {
+func (r *OrderRepository) UpdateStatus(ctx context.Context, id uuid.UUID, status string) error {
 	_, err := r.pool.Exec(ctx, "UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2", status, id)
 	if err != nil {
 		return fmt.Errorf("failed to update order status: %w", err)

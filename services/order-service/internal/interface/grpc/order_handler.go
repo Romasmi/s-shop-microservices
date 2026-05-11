@@ -7,6 +7,7 @@ import (
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/usecase"
 	orderuc "github.com/Romasmi/s-shop-microservices/order-service/internal/usecase/order"
 	api "github.com/Romasmi/s-shop/gen/go/order"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -41,8 +42,8 @@ func (h *OrderHandler) PlaceOrder(ctx context.Context, req *api.PlaceOrderReques
 
 	o := resp.(*order.Order)
 	return &api.Order{
-		Id:     o.ID,
-		UserId: o.UserID,
+		Id:     o.ID.String(),
+		UserId: o.UserID.String(),
 		Price:  o.Price,
 		Status: o.Status,
 	}, nil
@@ -50,15 +51,19 @@ func (h *OrderHandler) PlaceOrder(ctx context.Context, req *api.PlaceOrderReques
 
 func (h *OrderHandler) GetOrder(ctx context.Context, req *api.GetOrderRequest) (*api.Order, error) {
 	handler := h.app.GetHandler(usecase.UseCaseGetOrder)
-	resp, err := handler.Do(ctx, req.Id)
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid order id: %v", err)
+	}
+	resp, err := handler.Do(ctx, id)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "order not found: %v", err)
 	}
 
 	o := resp.(*order.Order)
 	return &api.Order{
-		Id:     o.ID,
-		UserId: o.UserID,
+		Id:     o.ID.String(),
+		UserId: o.UserID.String(),
 		Price:  o.Price,
 		Status: o.Status,
 	}, nil

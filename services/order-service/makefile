@@ -36,5 +36,9 @@ kube-restart:
 kube-status:
 	kubectl rollout status deployment/order-service -n s-shop-system
 
+kube-logs:
+	kubectl logs deployment/order-service -n s-shop-system
+
+
 lint:
 	golangci-lint run ./...

@@ -35,7 +35,7 @@ func NewGatewayServer(checker ReadyChecker, grpcAddr string, httpPort uint) (*ht
 	mainMux := http.NewServeMux()
 	mainMux.Handle("/", mux)
 	mainMux.Handle("/swagger/", httpSwagger.Handler(
-		httpSwagger.URL("/swagger-static/api/user.swagger.json"),
+		httpSwagger.URL("/swagger-static/api/order.swagger.json"),
 	))
 	mainMux.HandleFunc("/swagger-static/", serveSwaggerStatic)
 	mainMux.HandleFunc("/proto/", serveProto)
@@ -72,7 +72,7 @@ func serveSwaggerStatic(w http.ResponseWriter, r *http.Request) {
 func serveProto(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Clean(r.URL.Path)
 	if path == "/proto/" || path == "/proto" {
-		http.ServeFile(w, r, "api/user.proto")
+		http.ServeFile(w, r, "api/order.proto")
 		return
 	}
 

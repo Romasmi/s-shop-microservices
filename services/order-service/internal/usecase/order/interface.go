@@ -5,11 +5,12 @@ import (
 
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/domain/order"
 	api "github.com/Romasmi/s-shop/gen/go/order"
+	"github.com/google/uuid"
 )
 
 type Repository interface {
 	CreateOrder(ctx context.Context, o *order.Order) error
-	GetOrder(ctx context.Context, id string) (*order.Order, error)
+	GetOrder(ctx context.Context, id uuid.UUID) (*order.Order, error)
 }
 
 type EventProducer interface {

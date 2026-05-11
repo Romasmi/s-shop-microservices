@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/domain/message"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -24,7 +25,7 @@ func (r *MessageRepository) CreateMessage(ctx context.Context, m *message.Messag
 	return nil
 }
 
-func (r *MessageRepository) ListMessages(ctx context.Context, userID string) ([]*message.Message, error) {
+func (r *MessageRepository) ListMessages(ctx context.Context, userID uuid.UUID) ([]*message.Message, error) {
 	rows, err := r.pool.Query(ctx, "SELECT id, user_id, order_id, type, created_at, updated_at FROM messages WHERE user_id = $1", userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list messages: %w", err)

@@ -49,6 +49,10 @@ services:
     replicas: 1
     config:
       DB_NAME: "order_service"
+      USER_SERVICE_ADDR: "user-service:9000"
+      BILLING_SERVICE_ADDR: "billing-service:9000"
+      WAREHOUSE_SERVICE_ADDR: "warehouse-service:9000"
+      DELIVERY_SERVICE_ADDR: "delivery-service:9000"
 
   billing-service:
     enabled: true
