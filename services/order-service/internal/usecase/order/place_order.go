@@ -95,8 +95,6 @@ func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*or
 
 	if uc.producer != nil {
 		if err := uc.producer.EmitOrderPlaced(ctx, event); err != nil {
-			// Log error but don't fail the order if it was successful?
-			// Actually instructions say "Abort with error if this call fails" only for GetUser.
 			fmt.Printf("failed to emit order.placed event: %v\n", err)
 		}
 	}
