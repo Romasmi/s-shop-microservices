@@ -50,7 +50,6 @@ func NewPlaceOrderUseCase(
 }
 
 func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*order.Order, error) {
-	// 1. Fetch user details
 	userResp, err := uc.userClient.GetUser(ctx, &userapi.GetUserRequest{UserId: input.UserID})
 	if err != nil {
 		return nil, err

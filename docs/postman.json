@@ -88,7 +88,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n  \"productId\": \"product-123\",\n  \"count\": 100\n}"
+                    "raw": "{\n  \"productId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"count\": 100\n}"
                 },
                 "url": {
                     "raw": "{{baseUrl}}/warehouse/products",
@@ -222,7 +222,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"600\",\n  \"productId\": \"product-123\",\n  \"count\": 1\n}"
+                    "raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"600\",\n  \"productId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"count\": 1\n}"
                 },
                 "url": {
                     "raw": "{{baseUrl}}/order",
@@ -358,7 +358,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"1000\",\n  \"productId\": \"product-123\",\n  \"count\": 1\n}"
+                    "raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"1000\",\n  \"productId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"count\": 1\n}"
                 },
                 "url": {
                     "raw": "{{baseUrl}}/order",
