@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package delivery;
+
+option go_package = "github.com/Romasmi/s-shop/gen/go/delivery;delivery";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service DeliveryService {
+  rpc AddCourier(AddCourierRequest) returns (Courier) {
+    option (google.api.http) = {
+      post: "/delivery/couriers"
+      body: "*"
+    };
+  }
+  rpc ReserveCourier(ReserveCourierRequest) returns (ReserveCourierResponse) {
+    option (google.api.http) = {
+      post: "/delivery/reserve"
+      body: "*"
+    };
+  }
+  rpc CancelCourier(CancelCourierRequest) returns (CancelCourierResponse) {
+    option (google.api.http) = {
+      post: "/delivery/cancel"
+      body: "*"
+    };
+  }
+}
+
+message Courier {
+  string courier_id = 1;
+  string name = 2;
+}
+
+message AddCourierRequest {
+  string name = 1;
+}
+
+message ReserveCourierRequest {
+  string order_id = 1;
+  google.protobuf.Timestamp from_date = 2;
+  google.protobuf.Timestamp to_date = 3;
+}
+
+message ReserveCourierResponse {
+  bool success = 1;
+  string courier_id = 2;
+  string error = 3;
+}
+
+message CancelCourierRequest {
+  string order_id = 1;
+}
+
+message CancelCourierResponse {
+  bool success = 1;
+  string error = 2;
+}
