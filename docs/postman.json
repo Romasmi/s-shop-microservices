@@ -1,866 +1,400 @@
 {
-	"info": {
-		"_postman_id": "51fccbd1-e11e-4094-a3ca-e569270ba8a9",
-		"name": "S Shop System",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "37426353"
-	},
-	"item": [
-		{
-			"name": "1. Register User 1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.collectionVariables.set(\"user1_id\", response.id);",
-							"pm.collectionVariables.set(\"user1_username\", response.username);",
-							"pm.collectionVariables.set(\"user1_password\", response.password);",
-							"console.log(\"User 1 registered: \" + response.username + \" ID: \" + response.id);",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"username\": \"user1_{{$randomUserName}}\",\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"phone\": \"{{$randomPhoneNumber}}\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/user",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"user"
-					]
-				}
-			}
-		},
-		{
-			"name": "2. Check Get User 1 (Unauthorized)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });",
-							"console.log(\"Unauthorized GET request status: \" + pm.response.code);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/user/{{user1_id}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"user",
-						"{{user1_id}}"
-					]
-				}
-			}
-		},
-		{
-			"name": "3. Check Update User 1 (Unauthorized)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });",
-							"console.log(\"Unauthorized PUT request status: \" + pm.response.code);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"firstName\": \"Hacker\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/user/{{user1_id}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"user",
-						"{{user1_id}}"
-					]
-				}
-			}
-		},
-		{
-			"name": "4. Login User 1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.collectionVariables.set(\"user1_token\", response.token);",
-							"console.log(\"User 1 logged in, token received\");",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"login\": \"{{user1_username}}\",\n  \"password\": \"{{user1_password}}\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/auth/login",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"auth",
-						"login"
-					]
-				}
-			}
-		},
-		{
-			"name": "5. Update User 1 Profile",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"console.log(\"User 1 profile updated\");"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{user1_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"firstName\": \"NewName1\",\n  \"lastName\": \"NewLastName1\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/user/{{user1_id}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"user",
-						"{{user1_id}}"
-					]
-				}
-			}
-		},
-		{
-			"name": "6. Check Profile User 1 Updated",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.test(\"First Name is updated\", function () { pm.expect(response.firstName).to.eql(\"NewName1\"); });",
-							"console.log(\"Verified User 1 First Name: \" + response.firstName);",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{user1_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/user/{{user1_id}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"user",
-						"{{user1_id}}"
-					]
-				}
-			}
-		},
-		{
-			"name": "7. Register User 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.collectionVariables.set(\"user2_id\", response.id);",
-							"pm.collectionVariables.set(\"user2_username\", response.username);",
-							"pm.collectionVariables.set(\"user2_password\", response.password);",
-							"console.log(\"User 2 registered: \" + response.username + \" ID: \" + response.id);",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"username\": \"user2_{{$randomUserName}}\",\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"phone\": \"{{$randomPhoneNumber}}\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/user",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"user"
-					]
-				}
-			}
-		},
-		{
-			"name": "8. Login User 2",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.collectionVariables.set(\"user2_token\", response.token);",
-							"console.log(\"User 2 logged in, token received\");",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"login\": \"{{user2_username}}\",\n  \"password\": \"{{user2_password}}\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/auth/login",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"auth",
-						"login"
-					]
-				}
-			}
-		},
-		{
-			"name": "9. User 2 tries to GET User 1 Profile (Forbidden)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });",
-							"console.log(\"Forbidden GET request status: \" + pm.response.code);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{user2_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/user/{{user1_id}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"user",
-						"{{user1_id}}"
-					]
-				}
-			}
-		},
-		{
-			"name": "10. User 2 tries to PUT User 1 Profile (Forbidden)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });",
-							"console.log(\"Forbidden PUT request status: \" + pm.response.code);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{user2_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"firstName\": \"HackerName\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/user/{{user1_id}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"user",
-						"{{user1_id}}"
-					]
-				}
-			}
-		},
-		{
-			"name": "11. E2E 1: Register User",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.collectionVariables.set(\"e2e_userId\", response.id);",
-							"pm.collectionVariables.set(\"e2e_username\", response.username);",
-							"pm.collectionVariables.set(\"e2e_password\", response.password);",
-							"console.log(\"E2E User registered: \" + response.username + \" ID: \" + response.id);",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"username\": \"e2e_{{$randomUserName}}\",\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"phone\": \"{{$randomPhoneNumber}}\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/user",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"user"
-					]
-				}
-			}
-		},
-		{
-			"name": "12. E2E 2: Login User",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.collectionVariables.set(\"e2e_token\", response.token);",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"login\": \"{{e2e_username}}\",\n  \"password\": \"{{e2e_password}}\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/auth/login",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"auth",
-						"login"
-					]
-				}
-			}
-		},
-		{
-			"name": "13. E2E 3: Check Billing Account Created",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"pm.test(\"Balance is 0\", function () { pm.expect(response.balance).to.eql(\"0\"); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{e2e_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/billing/accounts/{{e2e_userId}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"billing",
-						"accounts",
-						"{{e2e_userId}}"
-					]
-				}
-			}
-		},
-		{
-			"name": "14. E2E 4: Top Up Account",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"pm.test(\"Balance is 1000\", function () { pm.expect(response.balance).to.eql(\"1000\"); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{e2e_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"amount\": \"1000\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/billing/accounts/{{e2e_userId}}/topup",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"billing",
-						"accounts",
-						"{{e2e_userId}}",
-						"topup"
-					]
-				}
-			}
-		},
-		{
-			"name": "15. E2E 5: Place Success Order",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{e2e_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"600\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/order",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"order"
-					]
-				}
-			}
-		},
-		{
-			"name": "16. E2E 6: Check Balance After Success Order",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"pm.test(\"Balance is 400\", function () { pm.expect(response.balance).to.eql(\"400\"); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{e2e_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/billing/accounts/{{e2e_userId}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"billing",
-						"accounts",
-						"{{e2e_userId}}"
-					]
-				}
-			}
-		},
-		{
-			"name": "17. E2E 7: Check Notification for Success Order",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"pm.test(\"Has ORDER_SUCCESS message\", function () { ",
-							"    const hasSuccess = response.messages.some(m => m.type === 'ORDER_SUCCESS');",
-							"    pm.expect(hasSuccess).to.be.true;",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{e2e_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/notification/messages",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"notification",
-						"messages"
-					],
-					"query": [
-						{
-							"key": "userId",
-							"value": "{{e2e_userId}}"
-						}
-					]
-				}
-			}
-		},
-		{
-			"name": "18. E2E 8: Place Failed Order (Insufficient Funds)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{e2e_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"1000\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/order",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"order"
-					]
-				}
-			}
-		},
-		{
-			"name": "19. E2E 9: Check Balance After Failed Order",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"pm.test(\"Balance is still 400\", function () { pm.expect(response.balance).to.eql(\"400\"); });"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{e2e_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/billing/accounts/{{e2e_userId}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"billing",
-						"accounts",
-						"{{e2e_userId}}"
-					]
-				}
-			}
-		},
-		{
-			"name": "20. E2E 10: Check Notification for Failed Order",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const response = pm.response.json();",
-							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
-							"pm.test(\"Has ORDER_FAILED message\", function () { ",
-							"    const hasFailed = response.messages.some(m => m.type === 'ORDER_FAILED');",
-							"    pm.expect(hasFailed).to.be.true;",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{e2e_token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/notification/messages",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"notification",
-						"messages"
-					],
-					"query": [
-						{
-							"key": "userId",
-							"value": "{{e2e_userId}}"
-						}
-					]
-				}
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "baseUrl",
-			"value": "http://arch.homework:8080",
-			"type": "string"
-		}
-	]
+    "info": {
+        "_postman_id": "51fccbd1-e11e-4094-a3ca-e569270ba8a9",
+        "name": "S Shop System",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "37426353"
+    },
+    "item": [
+        {
+            "name": "1. Create User",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "const response = pm.response.json();",
+                            "pm.collectionVariables.set(\"e2e_userId\", response.id);",
+                            "pm.collectionVariables.set(\"e2e_username\", response.username);",
+                            "pm.collectionVariables.set(\"e2e_password\", response.password);",
+                            "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                            "",
+                            "const loginRequest = {",
+                            "  url: pm.collectionVariables.get(\"baseUrl\") + '/auth/login',",
+                            "  method: 'POST',",
+                            "  header: { 'Content-Type': 'application/json' },",
+                            "  body: {",
+                            "    mode: 'raw',",
+                            "    raw: JSON.stringify({",
+                            "      login: response.username,",
+                            "      password: response.password",
+                            "    })",
+                            "  }",
+                            "};",
+                            "",
+                            "pm.sendRequest(loginRequest, function (err, res) {",
+                            "    if (!err) {",
+                            "        pm.collectionVariables.set(\"e2e_token\", res.json().token);",
+                            "        console.log(\"E2E Token obtained\");",
+                            "    }",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"username\": \"e2e_{{$randomUserName}}\",\n  \"firstName\": \"{{$randomFirstName}}\",\n  \"lastName\": \"{{$randomLastName}}\",\n  \"email\": \"{{$randomEmail}}\",\n  \"phone\": \"{{$randomPhoneNumber}}\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/user",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "user"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "2. Top Up Money",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "const response = pm.response.json();",
+                            "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                            "pm.test(\"Balance is 1000\", function () { pm.expect(response.balance).to.eql(\"1000\"); });"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{e2e_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"amount\": \"1000\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/billing/accounts/{{e2e_userId}}/topup",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "billing",
+                        "accounts",
+                        "{{e2e_userId}}",
+                        "topup"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "3. Make Success Order",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{e2e_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"600\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/order",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "order"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "4. Check Balance (Decreased)",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "const response = pm.response.json();",
+                            "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                            "pm.test(\"Balance is 400\", function () { pm.expect(response.balance).to.eql(\"400\"); });"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{e2e_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/billing/accounts/{{e2e_userId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "billing",
+                        "accounts",
+                        "{{e2e_userId}}"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "5. Check Notification (Success)",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "const response = pm.response.json();",
+                            "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                            "pm.test(\"Has ORDER_SUCCESS message\", function () { ",
+                            "    const hasSuccess = response.messages.some(m => m.type === 'ORDER_SUCCESS');",
+                            "    pm.expect(hasSuccess).to.be.true;",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{e2e_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/notification/messages?userId={{e2e_userId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "notification",
+                        "messages"
+                    ],
+                    "query": [
+                        {
+                            "key": "userId",
+                            "value": "{{e2e_userId}}"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "6. Make Failed Order",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{e2e_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"1000\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/order",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "order"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "7. Check Balance (Unchanged)",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "const response = pm.response.json();",
+                            "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                            "pm.test(\"Balance is still 400\", function () { pm.expect(response.balance).to.eql(\"400\"); });"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{e2e_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/billing/accounts/{{e2e_userId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "billing",
+                        "accounts",
+                        "{{e2e_userId}}"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "8. Check Notification (Failure)",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "const response = pm.response.json();",
+                            "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                            "pm.test(\"Has ORDER_FAILED message\", function () { ",
+                            "    const hasFailed = response.messages.some(m => m.type === 'ORDER_FAILED');",
+                            "    pm.expect(hasFailed).to.be.true;",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{e2e_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/notification/messages?userId={{e2e_userId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "notification",
+                        "messages"
+                    ],
+                    "query": [
+                        {
+                            "key": "userId",
+                            "value": "{{e2e_userId}}"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://arch.homework:8080",
+            "type": "string"
+        }
+    ]
 }
