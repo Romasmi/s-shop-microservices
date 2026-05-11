@@ -8,7 +8,7 @@ participant "notification-service" as NS
 
 Client -> OS: PlaceOrder
 OS -> US: GetUser
-US --> OS: full User
+US --> OS: User data
 OS -> BS: Withdraw {amount, idempotency_key=orderId}
 
 alt success
