@@ -26,6 +26,7 @@ RUN chown -R appuser:appgroup /app
 
 COPY --from=builder --chown=appuser:appgroup /app/services/delivery-service/main .
 COPY --from=builder --chown=appuser:appgroup /app/services/delivery-service/migrations ./migrations
+COPY --from=builder --chown=appuser:appgroup /app/services/delivery-service/config.yaml .
 
 USER appuser
 

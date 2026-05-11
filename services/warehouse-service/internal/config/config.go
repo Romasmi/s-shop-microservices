@@ -8,8 +8,8 @@ import (
 )
 
 type Config struct {
-	GRPCPort int `mapstructure:"grpc_port"`
-	Db       Database
+	Server Server
+	Db     Database
 }
 
 type Database struct {
@@ -18,6 +18,11 @@ type Database struct {
 	Name     string `mapstructure:"name"`
 	User     string `mapstructure:"user"`
 	Password string `mapstructure:"password"`
+}
+
+type Server struct {
+	Port     int `mapstructure:"port"`
+	GRPCPort int `mapstructure:"grpc_port"`
 }
 
 func bindEnvRecursive(viperInstance *viper.Viper, prefix string, val reflect.Value) error {
@@ -52,7 +57,18 @@ func bindEnvRecursive(viperInstance *viper.Viper, prefix string, val reflect.Val
 
 func LoadConfig(path string) (*Config, error) {
 	v := viper.New()
-	v.SetDefault("grpc_port", 8000)
+	v.SetConfigName("config")
+	v.SetConfigType("yaml")
+	v.AddConfigPath(path)
+
+	v.SetDefault("server.port", 8000)
+	v.SetDefault("server.grpc_port", 9000)
+
+	if err := v.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return nil, err
+		}
+	}
 
 	if err := bindEnvRecursive(v, "", reflect.ValueOf(&Config{}).Elem()); err != nil {
 		return nil, err
