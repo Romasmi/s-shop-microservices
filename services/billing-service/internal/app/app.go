@@ -53,7 +53,7 @@ func (a *App) registerHandlers() {
 }
 
 func (a *App) registerConsumers() {
-	userConsumer := kafka.NewUserConsumer(a.Cfg.Kafka.Brokers, "user.created", a.AccountRepo)
+	userConsumer := kafka.NewUserConsumer(a.Cfg.Kafka.Brokers, a.Cfg.Kafka.Topic, a.AccountRepo)
 	a.Consumers = append(a.Consumers, userConsumer)
 }
 

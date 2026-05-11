@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/domain/account"
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/infrastructure/db/postgres"
@@ -23,8 +24,9 @@ func NewUserConsumer(brokers []string, topic string, repo *postgres.AccountRepos
 			Brokers:  brokers,
 			Topic:    topic,
 			GroupID:  "billing-service",
-			MinBytes: 10e3, // 10KB
+			MinBytes: 1,
 			MaxBytes: 10e6, // 10MB
+			MaxWait:  500 * time.Millisecond,
 		}),
 		repo: repo,
 	}

@@ -55,7 +55,7 @@ func (a *App) GetHandler(id usecase.UseCaseID) usecase.Handler {
 }
 
 func (a *App) registerConsumers() {
-	orderConsumer := kafka.NewOrderConsumer(a.Cfg.Kafka.Brokers, "order.placed", a.MessageRepo)
+	orderConsumer := kafka.NewOrderConsumer(a.Cfg.Kafka.Brokers, a.Cfg.Kafka.Topic, a.MessageRepo)
 	a.Consumers = append(a.Consumers, orderConsumer)
 }
 

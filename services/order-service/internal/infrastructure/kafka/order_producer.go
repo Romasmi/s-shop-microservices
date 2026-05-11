@@ -3,6 +3,7 @@ package kafka
 import (
 	"context"
 	"fmt"
+	"time"
 
 	api "github.com/Romasmi/s-shop/gen/go/order"
 	"github.com/segmentio/kafka-go"
@@ -16,9 +17,11 @@ type OrderProducer struct {
 func NewOrderProducer(brokers []string, topic string) *OrderProducer {
 	return &OrderProducer{
 		writer: &kafka.Writer{
-			Addr:     kafka.TCP(brokers...),
-			Topic:    topic,
-			Balancer: &kafka.LeastBytes{},
+			Addr:         kafka.TCP(brokers...),
+			Topic:        topic,
+			Balancer:     &kafka.LeastBytes{},
+			BatchTimeout: 10 * time.Millisecond,
+			RequiredAcks: kafka.RequireAll,
 		},
 	}
 }

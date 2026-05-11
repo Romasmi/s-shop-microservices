@@ -31,6 +31,9 @@ func (h *OrderHandler) PlaceOrder(ctx context.Context, req *api.PlaceOrderReques
 		Price:  req.Price,
 	})
 	if err != nil {
+		if s, ok := status.FromError(err); ok {
+			return nil, s.Err()
+		}
 		return nil, status.Errorf(codes.Internal, "failed to place order: %v", err)
 	}
 

@@ -38,7 +38,7 @@ func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*or
 	// 1. Fetch user details
 	userResp, err := uc.userClient.GetUser(ctx, &userapi.GetUserRequest{UserId: input.UserID})
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch user: %w", err)
+		return nil, err
 	}
 
 	orderID := uuid.New().String()
@@ -58,7 +58,7 @@ func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*or
 		IdempotencyKey: orderID,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("billing service call failed: %w", err)
+		return nil, err
 	}
 
 	if withdrawResp.Success {

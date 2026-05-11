@@ -20,9 +20,11 @@ type UserProducer struct {
 func NewUserProducer(brokers []string, topic string) *UserProducer {
 	return &UserProducer{
 		Writer: &kafka.Writer{
-			Addr:     kafka.TCP(brokers...),
-			Topic:    topic,
-			Balancer: &kafka.LeastBytes{},
+			Addr:         kafka.TCP(brokers...),
+			Topic:        topic,
+			Balancer:     &kafka.LeastBytes{},
+			BatchTimeout: 10 * time.Millisecond,
+			RequiredAcks: kafka.RequireAll,
 		},
 	}
 }

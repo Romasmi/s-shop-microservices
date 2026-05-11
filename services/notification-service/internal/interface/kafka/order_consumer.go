@@ -23,8 +23,9 @@ func NewOrderConsumer(brokers []string, topic string, repo *postgres.MessageRepo
 			Brokers:  brokers,
 			Topic:    topic,
 			GroupID:  "notification-service",
-			MinBytes: 10e3,
+			MinBytes: 1,
 			MaxBytes: 10e6,
+			MaxWait:  500 * time.Millisecond,
 		}),
 		repo: repo,
 	}
