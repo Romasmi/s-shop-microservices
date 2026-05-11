@@ -10,7 +10,9 @@ import (
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/usecase"
 	orderuc "github.com/Romasmi/s-shop-microservices/order-service/internal/usecase/order"
 	billingapi "github.com/Romasmi/s-shop/gen/go/billing"
+	deliveryapi "github.com/Romasmi/s-shop/gen/go/delivery"
 	userapi "github.com/Romasmi/s-shop/gen/go/user"
+	warehouseapi "github.com/Romasmi/s-shop/gen/go/warehouse"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -24,6 +26,8 @@ type App struct {
 	Handlers      map[usecase.UseCaseID]usecase.Handler
 	userConn      *grpc.ClientConn
 	billingConn   *grpc.ClientConn
+	warehouseConn *grpc.ClientConn
+	deliveryConn  *grpc.ClientConn
 }
 
 func NewApp(cfg *config.Config) (*App, error) {
@@ -40,17 +44,29 @@ func NewApp(cfg *config.Config) (*App, error) {
 	orderProducer := kafka.NewOrderProducer(cfg.Kafka.Brokers, cfg.Kafka.Topic)
 
 	// gRPC clients
-	userConn, err := grpc.Dial(cfg.UserServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	userConn, err := grpc.NewClient(cfg.UserServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, fmt.Errorf("failed to dial user service: %w", err)
 	}
 	userClient := userapi.NewUserServiceClient(userConn)
 
-	billingConn, err := grpc.Dial(cfg.BillingServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	billingConn, err := grpc.NewClient(cfg.BillingServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, fmt.Errorf("failed to dial billing service: %w", err)
 	}
 	billingClient := billingapi.NewBillingServiceClient(billingConn)
+
+	warehouseConn, err := grpc.NewClient(cfg.WarehouseServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to dial warehouse service: %w", err)
+	}
+	warehouseClient := warehouseapi.NewWarehouseServiceClient(warehouseConn)
+
+	deliveryConn, err := grpc.NewClient(cfg.DeliveryServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, fmt.Errorf("failed to dial delivery service: %w", err)
+	}
+	deliveryClient := deliveryapi.NewDeliveryServiceClient(deliveryConn)
 
 	app := &App{
 		Cfg:           cfg,
@@ -60,15 +76,17 @@ func NewApp(cfg *config.Config) (*App, error) {
 		Handlers:      make(map[usecase.UseCaseID]usecase.Handler),
 		userConn:      userConn,
 		billingConn:   billingConn,
+		warehouseConn: warehouseConn,
+		deliveryConn:  deliveryConn,
 	}
 
-	app.registerHandlers(userClient, billingClient)
+	app.registerHandlers(userClient, billingClient, warehouseClient, deliveryClient)
 
 	return app, nil
 }
 
-func (a *App) registerHandlers(userClient userapi.UserServiceClient, billingClient billingapi.BillingServiceClient) {
-	a.Handlers[usecase.UseCasePlaceOrder] = usecase.NewHandler(orderuc.NewPlaceOrderUseCase(a.OrderRepo, userClient, billingClient, a.OrderProducer))
+func (a *App) registerHandlers(userClient userapi.UserServiceClient, billingClient billingapi.BillingServiceClient, warehouseClient warehouseapi.WarehouseServiceClient, deliveryClient deliveryapi.DeliveryServiceClient) {
+	a.Handlers[usecase.UseCasePlaceOrder] = usecase.NewHandler(orderuc.NewPlaceOrderUseCase(a.OrderRepo, userClient, billingClient, warehouseClient, deliveryClient, a.OrderProducer))
 	a.Handlers[usecase.UseCaseGetOrder] = usecase.NewHandler(orderuc.NewGetOrderUseCase(a.OrderRepo))
 }
 
@@ -88,6 +106,12 @@ func (a *App) Close() {
 	}
 	if a.billingConn != nil {
 		a.billingConn.Close()
+	}
+	if a.warehouseConn != nil {
+		a.warehouseConn.Close()
+	}
+	if a.deliveryConn != nil {
+		a.deliveryConn.Close()
 	}
 }
 

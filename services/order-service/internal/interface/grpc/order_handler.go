@@ -27,8 +27,10 @@ func NewOrderHandler(app interface {
 func (h *OrderHandler) PlaceOrder(ctx context.Context, req *api.PlaceOrderRequest) (*api.Order, error) {
 	handler := h.app.GetHandler(usecase.UseCasePlaceOrder)
 	resp, err := handler.Do(ctx, orderuc.PlaceOrderInput{
-		UserID: req.UserId,
-		Price:  req.Price,
+		UserID:    req.UserId,
+		Price:     req.Price,
+		ProductID: req.ProductId,
+		Count:     req.Count,
 	})
 	if err != nil {
 		if s, ok := status.FromError(err); ok {

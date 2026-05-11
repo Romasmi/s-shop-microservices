@@ -9,11 +9,13 @@ import (
 )
 
 type Config struct {
-	Db                 Database
-	Server             Server
-	Kafka              Kafka
-	UserServiceAddr    string `mapstructure:"user_service_addr"`
-	BillingServiceAddr string `mapstructure:"billing_service_addr"`
+	Db                   Database
+	Server               Server
+	Kafka                Kafka
+	UserServiceAddr      string `mapstructure:"user_service_addr"`
+	BillingServiceAddr   string `mapstructure:"billing_service_addr"`
+	WarehouseServiceAddr string `mapstructure:"warehouse_service_addr"`
+	DeliveryServiceAddr  string `mapstructure:"delivery_service_addr"`
 }
 
 type Database struct {

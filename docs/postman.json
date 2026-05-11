@@ -67,6 +67,78 @@
             }
         },
         {
+            "name": "1.1 Setup Warehouse",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{e2e_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"productId\": \"product-123\",\n  \"count\": 100\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/warehouse/products",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "warehouse",
+                        "products"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "1.2 Setup Delivery",
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{e2e_token}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"name\": \"Courier John\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/delivery/couriers",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "delivery",
+                        "couriers"
+                    ]
+                }
+            }
+        },
+        {
             "name": "2. Top Up Money",
             "event": [
                 {
@@ -150,7 +222,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"600\"\n}"
+                    "raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"600\",\n  \"productId\": \"product-123\",\n  \"count\": 1\n}"
                 },
                 "url": {
                     "raw": "{{baseUrl}}/order",
@@ -286,7 +358,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"1000\"\n}"
+                    "raw": "{\n  \"userId\": \"{{e2e_userId}}\",\n  \"price\": \"1000\",\n  \"productId\": \"product-123\",\n  \"count\": 1\n}"
                 },
                 "url": {
                     "raw": "{{baseUrl}}/order",
