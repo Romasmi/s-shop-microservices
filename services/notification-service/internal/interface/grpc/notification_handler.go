@@ -3,9 +3,9 @@ package grpc
 import (
 	"context"
 
-	api "github.com/Romasmi/s-shop-microservices/notification-service/internal/api"
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/domain/message"
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/usecase"
+	api "github.com/Romasmi/s-shop/gen/go/notification"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

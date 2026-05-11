@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/domain/order"
-	api "github.com/Romasmi/s-shop-microservices/order-service/pkg/api"
+	api "github.com/Romasmi/s-shop/gen/go/order"
 )
 
 type Repository interface {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/domain/account"
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/infrastructure/db/postgres"
-	api "github.com/Romasmi/s-shop-microservices/billing-service/pkg/api"
+	userapi "github.com/Romasmi/s-shop/gen/go/user"
 	"github.com/google/uuid"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -42,7 +42,7 @@ func (c *UserConsumer) Start(ctx context.Context) {
 			continue
 		}
 
-		var event api.UserCreated
+		var event userapi.UserCreated
 		if err := protojson.Unmarshal(m.Value, &event); err != nil {
 			slog.Error("failed to unmarshal user.created event", "error", err)
 			continue

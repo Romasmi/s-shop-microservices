@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	api "github.com/Romasmi/s-shop-microservices/user-service/internal/api"
 	"github.com/Romasmi/s-shop-microservices/user-service/internal/middleware"
+	api "github.com/Romasmi/s-shop/gen/go/user"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"

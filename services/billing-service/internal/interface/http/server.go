@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/interface/http/middleware"
-	api "github.com/Romasmi/s-shop-microservices/billing-service/pkg/api"
+	api "github.com/Romasmi/s-shop/gen/go/billing"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"

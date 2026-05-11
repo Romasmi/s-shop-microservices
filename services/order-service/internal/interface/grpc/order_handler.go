@@ -6,7 +6,7 @@ import (
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/domain/order"
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/usecase"
 	orderuc "github.com/Romasmi/s-shop-microservices/order-service/internal/usecase/order"
-	api "github.com/Romasmi/s-shop-microservices/order-service/pkg/api"
+	api "github.com/Romasmi/s-shop/gen/go/order"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

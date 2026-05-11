@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	billingapi "github.com/Romasmi/s-shop-microservices/billing-service/pkg/api"
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/domain/order"
-	api "github.com/Romasmi/s-shop-microservices/order-service/pkg/api"
+	billingapi "github.com/Romasmi/s-shop/gen/go/billing"
+	api "github.com/Romasmi/s-shop/gen/go/order"
+	userapi "github.com/Romasmi/s-shop/gen/go/user"
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -19,12 +20,12 @@ type PlaceOrderInput struct {
 
 type PlaceOrderUseCase struct {
 	repo          Repository
-	userClient    api.UserServiceClient
+	userClient    userapi.UserServiceClient
 	billingClient billingapi.BillingServiceClient
 	producer      EventProducer
 }
 
-func NewPlaceOrderUseCase(repo Repository, userClient api.UserServiceClient, billingClient billingapi.BillingServiceClient, producer EventProducer) *PlaceOrderUseCase {
+func NewPlaceOrderUseCase(repo Repository, userClient userapi.UserServiceClient, billingClient billingapi.BillingServiceClient, producer EventProducer) *PlaceOrderUseCase {
 	return &PlaceOrderUseCase{
 		repo:          repo,
 		userClient:    userClient,
@@ -35,7 +36,7 @@ func NewPlaceOrderUseCase(repo Repository, userClient api.UserServiceClient, bil
 
 func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*order.Order, error) {
 	// 1. Fetch user details
-	userResp, err := uc.userClient.GetUser(ctx, &api.GetUserRequest{Id: input.UserID})
+	userResp, err := uc.userClient.GetUser(ctx, &userapi.GetUserRequest{Id: input.UserID})
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch user: %w", err)
 	}

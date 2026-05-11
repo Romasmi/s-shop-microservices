@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	api "github.com/Romasmi/s-shop-microservices/order-service/pkg/api"
+	api "github.com/Romasmi/s-shop/gen/go/order"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/protobuf/encoding/protojson"
 )

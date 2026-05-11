@@ -1,8 +1,8 @@
 package grpc
 
 import (
-	api "github.com/Romasmi/s-shop-microservices/notification-service/internal/api"
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/usecase"
+	api "github.com/Romasmi/s-shop/gen/go/notification"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
