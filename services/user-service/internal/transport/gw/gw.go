@@ -7,6 +7,7 @@ import (
 
 	"github.com/Romasmi/s-shop-microservices/user-service/internal/middleware"
 	api "github.com/Romasmi/s-shop/gen/go/user"
+	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
@@ -19,24 +20,29 @@ type ReadyChecker interface {
 
 func NewGatewayServer(checker ReadyChecker, grpcAddr string, httpPort uint) (*http.Server, error) {
 	ctx := context.Background()
-	mux := runtime.NewServeMux()
+	gwMux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 
-	err := api.RegisterUserServiceHandlerFromEndpoint(ctx, mux, grpcAddr, opts)
+	err := api.RegisterUserServiceHandlerFromEndpoint(ctx, gwMux, grpcAddr, opts)
 	if err != nil {
 		return nil, err
 	}
 
-	mainMux := http.NewServeMux()
-	mainMux.Handle("/", mux)
-	mainMux.Handle("/metrics", promhttp.Handler())
+	r := mux.NewRouter()
 
-	mainMux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	// Apply AuthMiddleware to /user/{userId} routes
+	userRouter := r.PathPrefix("/user/{userId}").Subrouter()
+	userRouter.Use(middleware.AuthMiddleware)
+	userRouter.Path("").Handler(gwMux)
+	userRouter.Path("/").Handler(gwMux)
+
+	// Other routes
+	r.Handle("/metrics", promhttp.Handler())
+	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("OK"))
 	})
-
-	mainMux.HandleFunc("/ready", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/ready", func(w http.ResponseWriter, r *http.Request) {
 		if err := checker.Ping(); err != nil {
 			w.WriteHeader(http.StatusServiceUnavailable)
 			_, _ = w.Write([]byte("UNREADY"))
@@ -46,8 +52,11 @@ func NewGatewayServer(checker ReadyChecker, grpcAddr string, httpPort uint) (*ht
 		_, _ = w.Write([]byte("READY"))
 	})
 
+	// Fallback for other /user routes (like POST /user)
+	r.PathPrefix("/").Handler(gwMux)
+
 	return &http.Server{
 		Addr:    fmt.Sprintf(":%d", httpPort),
-		Handler: middleware.MetricsMiddleware(mainMux),
+		Handler: middleware.MetricsMiddleware(r),
 	}, nil
 }

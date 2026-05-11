@@ -7,6 +7,7 @@ import (
 	"github.com/Romasmi/s-shop-microservices/user-service/internal/usecase"
 	api "github.com/Romasmi/s-shop/gen/go/user"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -54,7 +55,7 @@ func (h *UserHandler) CreateUser(ctx context.Context, req *api.CreateUserRequest
 }
 
 func (h *UserHandler) GetUser(ctx context.Context, req *api.GetUserRequest) (*api.User, error) {
-	id, err := uuid.Parse(req.Id)
+	id, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -76,4 +77,60 @@ func (h *UserHandler) GetUser(ctx context.Context, req *api.GetUserRequest) (*ap
 		Password:  u.Password,
 		CreatedAt: timestamppb.New(u.CreatedAt),
 	}, nil
+}
+
+func (h *UserHandler) UpdateUser(ctx context.Context, req *api.UpdateUserRequest) (*api.User, error) {
+	id, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	u := &user.User{
+		ID: id,
+	}
+	if req.Email != nil {
+		u.Email = *req.Email
+	}
+	if req.FirstName != nil {
+		u.FirstName = *req.FirstName
+	}
+	if req.LastName != nil {
+		u.LastName = *req.LastName
+	}
+	if req.Phone != nil {
+		u.Phone = *req.Phone
+	}
+
+	handler := h.app.GetHandler(usecase.UseCaseUpdateUser)
+	resp, err := handler.Do(ctx, u)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedUser := resp.(*user.User)
+	return &api.User{
+		Id:        updatedUser.ID.String(),
+		Username:  updatedUser.Username,
+		Email:     updatedUser.Email,
+		FirstName: updatedUser.FirstName,
+		LastName:  updatedUser.LastName,
+		Phone:     updatedUser.Phone,
+		Password:  updatedUser.Password,
+		CreatedAt: timestamppb.New(updatedUser.CreatedAt),
+	}, nil
+}
+
+func (h *UserHandler) DeleteUser(ctx context.Context, req *api.DeleteUserRequest) (*emptypb.Empty, error) {
+	id, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	handler := h.app.GetHandler(usecase.UseCaseDeleteUser)
+	_, err = handler.Do(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }

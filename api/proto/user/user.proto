@@ -6,6 +6,7 @@ option go_package = "github.com/Romasmi/s-shop/gen/go/user;user";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (User) {
@@ -16,7 +17,18 @@ service UserService {
   }
   rpc GetUser(GetUserRequest) returns (User) {
     option (google.api.http) = {
-      get: "/user/{id}"
+      get: "/user/{userId}"
+    };
+  }
+  rpc UpdateUser(UpdateUserRequest) returns (User) {
+    option (google.api.http) = {
+      put: "/user/{userId}"
+      body: "*"
+    };
+  }
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/user/{userId}"
     };
   }
 }
@@ -41,5 +53,17 @@ message CreateUserRequest {
 }
 
 message GetUserRequest {
-  string id = 1;
+  string userId = 1;
+}
+
+message UpdateUserRequest {
+  string userId = 1;
+  optional string email = 2;
+  optional string first_name = 3;
+  optional string last_name = 4;
+  optional string phone = 5;
+}
+
+message DeleteUserRequest {
+  string userId = 1;
 }

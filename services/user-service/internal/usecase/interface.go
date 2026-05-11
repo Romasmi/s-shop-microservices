@@ -12,6 +12,8 @@ const (
 	UseCaseUnknown UseCaseID = iota
 	UseCaseCreateUser
 	UseCaseGetUser
+	UseCaseUpdateUser
+	UseCaseDeleteUser
 )
 
 func (id UseCaseID) String() string {
@@ -20,6 +22,10 @@ func (id UseCaseID) String() string {
 		return "CreateUser"
 	case UseCaseGetUser:
 		return "GetUser"
+	case UseCaseUpdateUser:
+		return "UpdateUser"
+	case UseCaseDeleteUser:
+		return "DeleteUser"
 	default:
 		return "Unknown"
 	}

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/domain/account"
 	"github.com/Romasmi/s-shop-microservices/billing-service/internal/usecase"
@@ -34,6 +35,9 @@ func (h *BillingHandler) GetAccount(ctx context.Context, req *api.GetAccountRequ
 	handler := h.app.GetHandler(usecase.UseCaseGetAccount)
 	resp, err := handler.Do(ctx, userID)
 	if err != nil {
+		if errors.Is(err, account.ErrAccountNotFound) {
+			return nil, status.Errorf(codes.NotFound, "account not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to get account: %v", err)
 	}
 
@@ -56,6 +60,9 @@ func (h *BillingHandler) TopUp(ctx context.Context, req *api.TopUpRequest) (*api
 		Amount: req.Amount,
 	})
 	if err != nil {
+		if errors.Is(err, account.ErrAccountNotFound) {
+			return nil, status.Errorf(codes.NotFound, "account not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to top up: %v", err)
 	}
 
@@ -79,6 +86,9 @@ func (h *BillingHandler) Withdraw(ctx context.Context, req *api.WithdrawRequest)
 		IdempotencyKey: req.IdempotencyKey,
 	})
 	if err != nil {
+		if errors.Is(err, account.ErrAccountNotFound) {
+			return nil, status.Errorf(codes.NotFound, "account not found")
+		}
 		return nil, status.Errorf(codes.Internal, "failed to withdraw: %v", err)
 	}
 

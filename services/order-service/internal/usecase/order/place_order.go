@@ -36,7 +36,7 @@ func NewPlaceOrderUseCase(repo Repository, userClient userapi.UserServiceClient,
 
 func (uc *PlaceOrderUseCase) Do(ctx context.Context, input PlaceOrderInput) (*order.Order, error) {
 	// 1. Fetch user details
-	userResp, err := uc.userClient.GetUser(ctx, &userapi.GetUserRequest{Id: input.UserID})
+	userResp, err := uc.userClient.GetUser(ctx, &userapi.GetUserRequest{UserId: input.UserID})
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch user: %w", err)
 	}

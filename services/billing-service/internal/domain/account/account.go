@@ -1,10 +1,13 @@
 package account
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+var ErrAccountNotFound = errors.New("account not found")
 
 type Account struct {
 	UserID    uuid.UUID `json:"user_id"`

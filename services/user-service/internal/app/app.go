@@ -61,6 +61,8 @@ func (a *App) init(configPath string) error {
 func (a *App) registerHandlers(userRepo *repository.UserRepository) {
 	a.Handlers[usecase.UseCaseCreateUser] = usecase.NewHandler(useruc.NewCreateUserUseCase(userRepo, a.Producer, a.Config.AuthServiceURL))
 	a.Handlers[usecase.UseCaseGetUser] = usecase.NewHandler(useruc.NewGetUserUseCase(userRepo))
+	a.Handlers[usecase.UseCaseUpdateUser] = usecase.NewHandler(useruc.NewUpdateUserUseCase(userRepo))
+	a.Handlers[usecase.UseCaseDeleteUser] = usecase.NewHandler(useruc.NewDeleteUserUseCase(userRepo))
 }
 
 func (a *App) GetHandler(id usecase.UseCaseID) usecase.Handler {

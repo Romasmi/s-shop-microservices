@@ -9,18 +9,20 @@ proto-gen:
 
 # Build Docker images and load them into minikube
 build:
-	$(MAKE) -C ./services/user-service docker-build
-	$(MAKE) -C ./services/auth-service docker-build
-	$(MAKE) -C ./services/notification-service docker-build
-	$(MAKE) -C ./services/order-service docker-build
-	$(MAKE) -C ./services/billing-service docker-build
+	$(MAKE) -j5 -C ./services/user-service docker-build & \
+	$(MAKE) -j5 -C ./services/auth-service docker-build & \
+	$(MAKE) -j5 -C ./services/notification-service docker-build & \
+	$(MAKE) -j5 -C ./services/order-service docker-build & \
+	$(MAKE) -j5 -C ./services/billing-service docker-build & \
+	wait
 
 docker-push:
-	$(MAKE) -C ./services/user-service docker-push
-	$(MAKE) -C ./services/auth-service docker-push
-	$(MAKE) -C ./services/notification-service docker-push
-	$(MAKE) -C ./services/order-service docker-push
-	$(MAKE) -C ./services/billing-service docker-push
+	$(MAKE) -j5 -C ./services/user-service docker-push & \
+	$(MAKE) -j5 -C ./services/auth-service docker-push & \
+	$(MAKE) -j5 -C ./services/notification-service docker-push & \
+	$(MAKE) -j5 -C ./services/order-service docker-push & \
+	$(MAKE) -j5 -C ./services/billing-service docker-push & \
+	wait
 
 deploy: install-traefik install-db install-kafka install-prometheus install-grafana install-app
 
@@ -187,3 +189,6 @@ help:
 
 draw-puml:
 	plantuml -tsvg ./docs/puml/*.puml
+
+test-postman:
+	newman run docs/postman.json --verbose
