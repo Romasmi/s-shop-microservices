@@ -1,6 +1,10 @@
 package product
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
 
 var (
 	ErrProductNotFound   = errors.New("product not found")
@@ -8,12 +12,12 @@ var (
 )
 
 type Product struct {
-	ID    string
+	ID    uuid.UUID
 	Count int32
 }
 
 type Reservation struct {
-	ID        string
-	ProductID string
+	ID        uuid.UUID
+	ProductID uuid.UUID
 	Count     int32
 }

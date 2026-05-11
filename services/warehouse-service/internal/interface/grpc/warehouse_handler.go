@@ -5,6 +5,7 @@ import (
 
 	"github.com/Romasmi/s-shop-microservices/warehouse-service/internal/usecase/warehouse"
 	api "github.com/Romasmi/s-shop/gen/go/warehouse"
+	"github.com/google/uuid"
 )
 
 type WarehouseHandler struct {
@@ -17,18 +18,26 @@ func NewWarehouseHandler(uc *warehouse.UseCase) *WarehouseHandler {
 }
 
 func (h *WarehouseHandler) AddProduct(ctx context.Context, req *api.AddProductRequest) (*api.Product, error) {
-	p, err := h.uc.AddProduct(ctx, req.ProductId, req.Count)
+	productID, err := uuid.Parse(req.ProductId)
+	if err != nil {
+		return nil, err
+	}
+	p, err := h.uc.AddProduct(ctx, productID, req.Count)
 	if err != nil {
 		return nil, err
 	}
 	return &api.Product{
-		ProductId: p.ID,
+		ProductId: p.ID.String(),
 		Count:     p.Count,
 	}, nil
 }
 
 func (h *WarehouseHandler) ReserveProduct(ctx context.Context, req *api.ReserveProductRequest) (*api.ReserveProductResponse, error) {
-	reservationID, err := h.uc.ReserveProduct(ctx, req.ProductId, req.Count)
+	productID, err := uuid.Parse(req.ProductId)
+	if err != nil {
+		return &api.ReserveProductResponse{Success: false, Error: err.Error()}, nil
+	}
+	reservationID, err := h.uc.ReserveProduct(ctx, productID, req.Count)
 	if err != nil {
 		return &api.ReserveProductResponse{
 			Success: false,
@@ -37,12 +46,20 @@ func (h *WarehouseHandler) ReserveProduct(ctx context.Context, req *api.ReserveP
 	}
 	return &api.ReserveProductResponse{
 		Success:       true,
-		ReservationId: reservationID,
+		ReservationId: reservationID.String(),
 	}, nil
 }
 
 func (h *WarehouseHandler) ReleaseProduct(ctx context.Context, req *api.ReleaseProductRequest) (*api.ReleaseProductResponse, error) {
-	err := h.uc.ReleaseProduct(ctx, req.ProductId, req.ReservationId)
+	productID, err := uuid.Parse(req.ProductId)
+	if err != nil {
+		return &api.ReleaseProductResponse{Success: false, Error: err.Error()}, nil
+	}
+	reservationID, err := uuid.Parse(req.ReservationId)
+	if err != nil {
+		return &api.ReleaseProductResponse{Success: false, Error: err.Error()}, nil
+	}
+	err = h.uc.ReleaseProduct(ctx, productID, reservationID)
 	if err != nil {
 		return &api.ReleaseProductResponse{
 			Success: false,
@@ -55,7 +72,11 @@ func (h *WarehouseHandler) ReleaseProduct(ctx context.Context, req *api.ReleaseP
 }
 
 func (h *WarehouseHandler) CancelReservation(ctx context.Context, req *api.CancelReservationRequest) (*api.CancelReservationResponse, error) {
-	err := h.uc.CancelReservation(ctx, req.ReservationId)
+	reservationID, err := uuid.Parse(req.ReservationId)
+	if err != nil {
+		return &api.CancelReservationResponse{Success: false, Error: err.Error()}, nil
+	}
+	err = h.uc.CancelReservation(ctx, reservationID)
 	if err != nil {
 		return &api.CancelReservationResponse{
 			Success: false,

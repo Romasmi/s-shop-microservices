@@ -1,19 +1,23 @@
 package courier
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
 
 var (
 	ErrNoAvailableCourier = errors.New("no available courier")
 )
 
 type Courier struct {
-	ID   string
+	ID   uuid.UUID
 	Name string
 }
 
 type Slot struct {
-	OrderID   string
-	CourierID string
+	OrderID   uuid.UUID
+	CourierID uuid.UUID
 	FromDate  int64
 	ToDate    int64
 }

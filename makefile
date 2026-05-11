@@ -9,19 +9,23 @@ proto-gen:
 
 # Build Docker images and load them into minikube
 build:
-	$(MAKE) -j5 -C ./services/user-service docker-build & \
-	$(MAKE) -j5 -C ./services/auth-service docker-build & \
-	$(MAKE) -j5 -C ./services/notification-service docker-build & \
-	$(MAKE) -j5 -C ./services/order-service docker-build & \
-	$(MAKE) -j5 -C ./services/billing-service docker-build & \
+	$(MAKE) -j7 -C ./services/user-service docker-build & \
+	$(MAKE) -j7 -C ./services/auth-service docker-build & \
+	$(MAKE) -j7 -C ./services/notification-service docker-build & \
+	$(MAKE) -j7 -C ./services/order-service docker-build & \
+	$(MAKE) -j7 -C ./services/billing-service docker-build & \
+	$(MAKE) -j7 -C ./services/warehouse-service docker-build & \
+	$(MAKE) -j7 -C ./services/delivery-service docker-build & \
 	wait
 
 docker-push:
-	$(MAKE) -j5 -C ./services/user-service docker-push & \
-	$(MAKE) -j5 -C ./services/auth-service docker-push & \
-	$(MAKE) -j5 -C ./services/notification-service docker-push & \
-	$(MAKE) -j5 -C ./services/order-service docker-push & \
-	$(MAKE) -j5 -C ./services/billing-service docker-push & \
+	$(MAKE) -j7 -C ./services/user-service docker-push & \
+	$(MAKE) -j7 -C ./services/auth-service docker-push & \
+	$(MAKE) -j7 -C ./services/notification-service docker-push & \
+	$(MAKE) -j7 -C ./services/order-service docker-push & \
+	$(MAKE) -j7 -C ./services/billing-service docker-push & \
+	$(MAKE) -j7 -C ./services/warehouse-service docker-push & \
+	$(MAKE) -j7 -C ./services/delivery-service docker-push & \
 	wait
 
 deploy: install-traefik install-db install-kafka install-prometheus install-grafana install-app
@@ -118,6 +122,8 @@ wait-api:
 	kubectl rollout status deployment/order-service -n s-shop-system --timeout=120s
 	kubectl rollout status deployment/billing-service-api -n s-shop-system --timeout=120s
 	kubectl rollout status deployment/billing-service-worker -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/warehouse-service -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/delivery-service -n s-shop-system --timeout=120s
 
 restart:
 	kubectl rollout restart deployment/user-service -n s-shop-system
@@ -127,6 +133,8 @@ restart:
 	kubectl rollout restart deployment/order-service -n s-shop-system
 	kubectl rollout restart deployment/billing-service-api -n s-shop-system
 	kubectl rollout restart deployment/billing-service-worker -n s-shop-system
+	kubectl rollout restart deployment/warehouse-service -n s-shop-system
+	kubectl rollout restart deployment/delivery-service -n s-shop-system
 	$(MAKE) wait-api
 
 clean:
@@ -153,6 +161,8 @@ status:
 	@kubectl get pods -n s-shop-system -l app=notification-service
 	@kubectl get pods -n s-shop-system -l app=order-service
 	@kubectl get pods -n s-shop-system -l app=billing-service
+	@kubectl get pods -n s-shop-system -l app=warehouse-service
+	@kubectl get pods -n s-shop-system -l app=delivery-service
 	@echo "\n--- Services ---"
 	@kubectl get svc -n s-shop-system
 	@kubectl get svc -n traefik

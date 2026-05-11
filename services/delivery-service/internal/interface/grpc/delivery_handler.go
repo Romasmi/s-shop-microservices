@@ -5,6 +5,7 @@ import (
 
 	"github.com/Romasmi/s-shop-microservices/delivery-service/internal/usecase/delivery"
 	api "github.com/Romasmi/s-shop/gen/go/delivery"
+	"github.com/google/uuid"
 )
 
 type DeliveryHandler struct {
@@ -22,13 +23,17 @@ func (h *DeliveryHandler) AddCourier(ctx context.Context, req *api.AddCourierReq
 		return nil, err
 	}
 	return &api.Courier{
-		CourierId: c.ID,
+		CourierId: c.ID.String(),
 		Name:      c.Name,
 	}, nil
 }
 
 func (h *DeliveryHandler) ReserveCourier(ctx context.Context, req *api.ReserveCourierRequest) (*api.ReserveCourierResponse, error) {
-	courierID, err := h.uc.ReserveCourier(ctx, req.OrderId, req.FromDate.Seconds, req.ToDate.Seconds)
+	orderID, err := uuid.Parse(req.OrderId)
+	if err != nil {
+		return &api.ReserveCourierResponse{Success: false, Error: err.Error()}, nil
+	}
+	courierID, err := h.uc.ReserveCourier(ctx, orderID, req.FromDate.Seconds, req.ToDate.Seconds)
 	if err != nil {
 		return &api.ReserveCourierResponse{
 			Success: false,
@@ -37,12 +42,16 @@ func (h *DeliveryHandler) ReserveCourier(ctx context.Context, req *api.ReserveCo
 	}
 	return &api.ReserveCourierResponse{
 		Success:   true,
-		CourierId: courierID,
+		CourierId: courierID.String(),
 	}, nil
 }
 
 func (h *DeliveryHandler) CancelCourier(ctx context.Context, req *api.CancelCourierRequest) (*api.CancelCourierResponse, error) {
-	err := h.uc.CancelCourier(ctx, req.OrderId)
+	orderID, err := uuid.Parse(req.OrderId)
+	if err != nil {
+		return &api.CancelCourierResponse{Success: false, Error: err.Error()}, nil
+	}
+	err = h.uc.CancelCourier(ctx, orderID)
 	if err != nil {
 		return &api.CancelCourierResponse{
 			Success: false,

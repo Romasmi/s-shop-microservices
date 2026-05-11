@@ -16,7 +16,7 @@ func NewUseCase(repo Repository) *UseCase {
 	return &UseCase{repo: repo}
 }
 
-func (uc *UseCase) AddProduct(ctx context.Context, productID string, count int32) (*product.Product, error) {
+func (uc *UseCase) AddProduct(ctx context.Context, productID uuid.UUID, count int32) (*product.Product, error) {
 	p, err := uc.repo.GetProduct(ctx, productID)
 	if err != nil && err != product.ErrProductNotFound {
 		return nil, err
@@ -32,16 +32,16 @@ func (uc *UseCase) AddProduct(ctx context.Context, productID string, count int32
 	return p, nil
 }
 
-func (uc *UseCase) ReserveProduct(ctx context.Context, productID string, count int32) (string, error) {
+func (uc *UseCase) ReserveProduct(ctx context.Context, productID uuid.UUID, count int32) (uuid.UUID, error) {
 	p, err := uc.repo.GetProduct(ctx, productID)
 	if err != nil {
-		return "", err
+		return uuid.Nil, err
 	}
 	if p.Count < count {
-		return "", product.ErrInsufficientStock
+		return uuid.Nil, product.ErrInsufficientStock
 	}
 
-	reservationID := uuid.New().String()
+	reservationID := uuid.New()
 	r := &product.Reservation{
 		ID:        reservationID,
 		ProductID: productID,
@@ -49,13 +49,13 @@ func (uc *UseCase) ReserveProduct(ctx context.Context, productID string, count i
 	}
 
 	if err := uc.repo.CreateReservation(ctx, r); err != nil {
-		return "", err
+		return uuid.Nil, err
 	}
 
 	return reservationID, nil
 }
 
-func (uc *UseCase) ReleaseProduct(ctx context.Context, productID string, reservationID string) error {
+func (uc *UseCase) ReleaseProduct(ctx context.Context, productID uuid.UUID, reservationID uuid.UUID) error {
 	r, err := uc.repo.GetReservation(ctx, reservationID)
 	if err != nil {
 		return err
@@ -78,7 +78,7 @@ func (uc *UseCase) ReleaseProduct(ctx context.Context, productID string, reserva
 	return nil
 }
 
-func (uc *UseCase) CancelReservation(ctx context.Context, reservationID string) error {
+func (uc *UseCase) CancelReservation(ctx context.Context, reservationID uuid.UUID) error {
 	if err := uc.repo.DeleteReservation(ctx, reservationID); err != nil {
 		return err
 	}

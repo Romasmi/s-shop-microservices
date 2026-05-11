@@ -10,15 +10,17 @@ import (
 	"syscall"
 
 	"github.com/Romasmi/s-shop-microservices/delivery-service/internal/config"
-	"github.com/Romasmi/s-shop-microservices/delivery-service/internal/infrastructure/db/memory"
+	"github.com/Romasmi/s-shop-microservices/delivery-service/internal/infrastructure/db/postgres"
 	grpcint "github.com/Romasmi/s-shop-microservices/delivery-service/internal/interface/grpc"
 	"github.com/Romasmi/s-shop-microservices/delivery-service/internal/usecase/delivery"
 	api "github.com/Romasmi/s-shop/gen/go/delivery"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 )
 
 type App struct {
-	cfg *config.Config
+	cfg  *config.Config
+	pool *pgxpool.Pool
 }
 
 func NewApp(cfg *config.Config) *App {
@@ -26,7 +28,19 @@ func NewApp(cfg *config.Config) *App {
 }
 
 func (a *App) Run() error {
-	repo := memory.NewRepository()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	dbUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		a.cfg.Db.User, a.cfg.Db.Password, a.cfg.Db.Host, a.cfg.Db.Port, a.cfg.Db.Name)
+
+	pool, err := pgxpool.New(ctx, dbUrl)
+	if err != nil {
+		return fmt.Errorf("failed to connect to database: %w", err)
+	}
+	a.pool = pool
+
+	repo := postgres.NewCourierRepository(pool)
 	uc := delivery.NewUseCase(repo)
 	handler := grpcint.NewDeliveryHandler(uc)
 
@@ -39,9 +53,6 @@ func (a *App) Run() error {
 		return err
 	}
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-
 	go func() {
 		slog.Info("Delivery service starting", "addr", addr)
 		if err := grpcServer.Serve(lis); err != nil {
@@ -51,5 +62,6 @@ func (a *App) Run() error {
 
 	<-ctx.Done()
 	grpcServer.GracefulStop()
+	a.pool.Close()
 	return nil
 }

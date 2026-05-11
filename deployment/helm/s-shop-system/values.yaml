@@ -69,11 +69,15 @@ services:
     enabled: true
     image: warehouse-service
     replicas: 1
+    config:
+      DB_NAME: "warehouse_service"
 
   delivery-service:
     enabled: true
     image: delivery-service
     replicas: 1
+    config:
+      DB_NAME: "delivery_service"
 
 # Shared resources
 sharedConfig:

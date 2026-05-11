@@ -7,6 +7,7 @@ import (
 
 	"github.com/Romasmi/s-shop-microservices/auth-service/internal/services"
 	"github.com/Romasmi/s-shop-microservices/auth-service/internal/utils/http_utils"
+	"github.com/google/uuid"
 )
 
 type AuthHandler struct {
@@ -84,7 +85,13 @@ func (h *AuthHandler) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.authService.Register(r.Context(), req.UserID, req.Login, req.Password)
+	userID, err := uuid.Parse(req.UserID)
+	if err != nil {
+		http_utils.JsonError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = h.authService.Register(r.Context(), userID, req.Login, req.Password)
 	if err != nil {
 		http_utils.JsonError(w, http.StatusInternalServerError, err)
 		return
