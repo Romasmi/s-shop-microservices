@@ -1,0 +1,25 @@
+@startuml
+actor Client
+participant "API Gateway (Traefik)" as Gateway
+participant "Auth Service" as AuthService
+participant "User Service" as UserService
+
+Client -> Gateway: GET /user/{userId}\nAuthorization: Bearer <valid_token>
+activate Gateway
+
+Gateway -> AuthService: GET /auth\nAuthorization: Bearer <valid_token>
+activate AuthService
+AuthService -> AuthService: Validate JWT Token
+AuthService --> Gateway: 200 OK\nX-Auth-User-ID: {userId}
+deactivate AuthService
+
+Gateway -> UserService: GET /user/{userId}\nX-Auth-User-ID: {userId}
+activate UserService
+UserService -> UserService: Check X-Auth-User-ID == userId
+UserService -> UserService: Fetch User Data
+UserService --> Gateway: 200 OK (User JSON)
+deactivate UserService
+
+Gateway --> Client: 200 OK (User JSON)
+deactivate Gateway
+@enduml

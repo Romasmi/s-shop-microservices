@@ -1,0 +1,97 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: user-auth
+  namespace: s-shop-system
+spec:
+  forwardAuth:
+    address: http://auth-service.s-shop-system.svc.cluster.local:8000/auth
+    trustForwardHeader: true
+    authResponseHeaders:
+      - X-Auth-User-ID
+      - X-Auth-User-Login
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: internal-auth
+  namespace: s-shop-system
+spec:
+  basicAuth:
+    secret: internal-auth-basic-access
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-auth-prefix
+  namespace: s-shop-system
+spec:
+  stripPrefix:
+    prefixes:
+      - /auth
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-user-prefix
+  namespace: s-shop-system
+spec:
+  stripPrefix:
+    prefixes:
+      - /user
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+  namespace: traefik
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+      priority: 1000
+      middlewares:
+        - name: internal-auth
+          namespace: s-shop-system
+      services:
+        - name: api@internal
+          kind: TraefikService
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: public-api
+  namespace: s-shop-system
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: PathPrefix(`/auth`)
+      priority: 200
+      services:
+        - name: auth-service
+          port: 8000
+
+    - kind: Rule
+      match: Path(`/user`) && Method(`POST`)
+      priority: 300
+      services:
+        - name: user-service
+          port: 8000
+
+    - kind: Rule
+      match: PathPrefix(`/user`)
+      priority: 200
+      middlewares:
+        - name: user-auth
+      services:
+        - name: user-service
+          port: 8000

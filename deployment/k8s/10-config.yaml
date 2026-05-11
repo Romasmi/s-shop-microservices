@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-config
+  namespace: s-shop-system
+data:
+  DB_HOST: "postgresql"
+  DB_PORT: "5432"
+  SERVER_PORT: "8000"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-config
+  namespace: s-shop-system
+data:
+  DB_NAME: "user_service"
+  AUTH_SERVICE_URL: "http://auth-service:8000"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: user-secret
+  namespace: s-shop-system
+type: Opaque
+stringData:
+  DB_USER: "user"
+  DB_PASSWORD: "password"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-config
+  namespace: s-shop-system
+data:
+  DB_NAME: "auth_service"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: auth-secret
+  namespace: s-shop-system
+type: Opaque
+stringData:
+  DB_USER: "user"
+  DB_PASSWORD: "password"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: internal-auth-basic-access
+  namespace: s-shop-system
+type: Opaque
+stringData:
+  users: |
+    admin:$apr1$2Nk5zF3M$2Pfuqf7Yeq4mRKTV32aC7.
