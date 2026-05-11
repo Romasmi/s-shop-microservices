@@ -59,8 +59,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-replace github.com/Romasmi/s-shop-microservices/billing-service => ../billing-service
-
-replace github.com/Romasmi/s-shop-microservices/user-service => ../user-service
-
 replace github.com/Romasmi/s-shop => ../../api

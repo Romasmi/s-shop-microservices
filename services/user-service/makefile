@@ -1,7 +1,7 @@
 
 
 docker-build:
-	docker build --platform linux/amd64 -t romasmi/user-service:latest -f Dockerfile .
+	docker build --platform linux/amd64 -t romasmi/user-service:latest -f Dockerfile ../..
 	@if minikube status >/dev/null 2>&1; then \
 		echo "Loading image into minikube..."; \
 		minikube image load romasmi/user-service:latest; \

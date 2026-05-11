@@ -25,7 +25,7 @@ migrate-down:
 	migrate -path migrations -database "postgres://user:password@localhost:5432/billing_service?sslmode=disable" down
 
 docker-build:
-	docker build --platform linux/amd64 -t romasmi/billing-service:latest -f Dockerfile .
+	docker build --platform linux/amd64 -t romasmi/billing-service:latest -f Dockerfile ../..
 	@if minikube status >/dev/null 2>&1; then \
 		echo "Loading image into minikube..."; \
 		minikube image load romasmi/billing-service:latest; \
@@ -39,6 +39,12 @@ kube-restart:
 
 kube-status:
 	kubectl rollout status deployment/billing-service -n s-shop-system
+
+kube-logs-worker:
+	kubectl logs deployment/billing-service-worker -n s-shop-system
+
+kube-logs-api:
+	kubectl logs deployment/billing-service-api -n s-shop-system
 
 lint:
 	golangci-lint run ./...
