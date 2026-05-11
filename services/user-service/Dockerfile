@@ -1,8 +1,18 @@
 FROM golang:1.25.1-alpine AS builder
 WORKDIR /app
-COPY go.mod go.sum ./
+
+# Copy the shared api module
+COPY api/ ./api/
+
+# Copy the service go.mod/sum
+COPY services/user-service/go.mod services/user-service/go.sum ./services/user-service/
+
+WORKDIR /app/services/user-service
 RUN go mod download
-COPY . .
+
+# Copy the rest of the service source
+COPY services/user-service/ .
+
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main ./cmd/api
 
 FROM alpine:latest
@@ -14,9 +24,9 @@ RUN addgroup -g 10001 -S appgroup && \
 WORKDIR /app
 RUN chown -R appuser:appgroup /app
 
-COPY --from=builder --chown=appuser:appgroup /app/main .
-COPY --from=builder --chown=appuser:appgroup /app/migrations ./migrations
-COPY --from=builder --chown=appuser:appgroup /app/config.yaml .
+COPY --from=builder --chown=appuser:appgroup /app/services/user-service/main .
+COPY --from=builder --chown=appuser:appgroup /app/services/user-service/migrations ./migrations
+COPY --from=builder --chown=appuser:appgroup /app/services/user-service/config.yaml .
 USER appuser
 
 EXPOSE 8000
