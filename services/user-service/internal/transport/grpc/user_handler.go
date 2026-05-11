@@ -3,9 +3,9 @@ package grpc
 import (
 	"context"
 
-	api "github.com/Romasmi/s-shop-microservices/user-service/internal/api"
 	"github.com/Romasmi/s-shop-microservices/user-service/internal/domain/user"
 	"github.com/Romasmi/s-shop-microservices/user-service/internal/usecase"
+	api "github.com/Romasmi/s-shop/gen/go/user"
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

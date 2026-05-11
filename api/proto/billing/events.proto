@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+package billing;
+
+option go_package = "github.com/Romasmi/s-shop/gen/go/billing;billing";

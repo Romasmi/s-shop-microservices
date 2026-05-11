@@ -41,3 +41,5 @@ require (
 	golang.org/x/text v0.31.0 // indirect
 	google.golang.org/protobuf v1.36.7 // indirect
 )
+
+replace github.com/Romasmi/s-shop => ../../api

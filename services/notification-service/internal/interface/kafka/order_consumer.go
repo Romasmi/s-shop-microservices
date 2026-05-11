@@ -7,7 +7,7 @@ import (
 
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/domain/message"
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/infrastructure/db/postgres"
-	orderapi "github.com/Romasmi/s-shop-microservices/order-service/pkg/api"
+	orderapi "github.com/Romasmi/s-shop/gen/go/order"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/protobuf/encoding/protojson"
 )

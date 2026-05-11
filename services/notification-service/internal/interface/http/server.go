@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	api "github.com/Romasmi/s-shop-microservices/notification-service/internal/api"
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/interface/http/middleware"
+	api "github.com/Romasmi/s-shop/gen/go/notification"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"

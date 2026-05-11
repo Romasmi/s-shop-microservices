@@ -3,15 +3,15 @@ module github.com/Romasmi/s-shop-microservices/notification-service
 go 1.25.1
 
 require (
-	github.com/Romasmi/s-shop-microservices/order-service v0.0.0-00010101000000-000000000000
+	github.com/Romasmi/s-shop v0.0.0
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/segmentio/kafka-go v0.4.51
 	github.com/spf13/viper v1.21.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20260414002931-afd174a4e478
-	google.golang.org/grpc v1.80.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20260504160031-60b97b32f348
+	google.golang.org/grpc v1.81.0
 	google.golang.org/protobuf v1.36.11
 )
 
@@ -43,9 +43,11 @@ require (
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/text v0.36.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260414002931-afd174a4e478 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260427160629-7cedc36a6bc4 // indirect
 )
 
 replace github.com/Romasmi/s-shop-microservices/billing-service => ../billing-service
 
 replace github.com/Romasmi/s-shop-microservices/order-service => ../order-service
+
+replace github.com/Romasmi/s-shop => ../../api

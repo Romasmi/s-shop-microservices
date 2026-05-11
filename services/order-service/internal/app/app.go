@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	billingapi "github.com/Romasmi/s-shop-microservices/billing-service/pkg/api"
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/config"
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/infrastructure/db/postgres"
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/infrastructure/kafka"
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/usecase"
 	orderuc "github.com/Romasmi/s-shop-microservices/order-service/internal/usecase/order"
-	api "github.com/Romasmi/s-shop-microservices/order-service/pkg/api"
+	billingapi "github.com/Romasmi/s-shop/gen/go/billing"
+	userapi "github.com/Romasmi/s-shop/gen/go/user"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -44,7 +44,7 @@ func NewApp(cfg *config.Config) (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to dial user service: %w", err)
 	}
-	userClient := api.NewUserServiceClient(userConn)
+	userClient := userapi.NewUserServiceClient(userConn)
 
 	billingConn, err := grpc.Dial(cfg.BillingServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -67,7 +67,7 @@ func NewApp(cfg *config.Config) (*App, error) {
 	return app, nil
 }
 
-func (a *App) registerHandlers(userClient api.UserServiceClient, billingClient billingapi.BillingServiceClient) {
+func (a *App) registerHandlers(userClient userapi.UserServiceClient, billingClient billingapi.BillingServiceClient) {
 	a.Handlers[usecase.UseCasePlaceOrder] = usecase.NewHandler(orderuc.NewPlaceOrderUseCase(a.OrderRepo, userClient, billingClient, a.OrderProducer))
 	a.Handlers[usecase.UseCaseGetOrder] = usecase.NewHandler(orderuc.NewGetOrderUseCase(a.OrderRepo))
 }

@@ -8,9 +8,9 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/Romasmi/s-shop-microservices/user-service/internal/api"
 	grpcint "github.com/Romasmi/s-shop-microservices/user-service/internal/transport/grpc"
 	"github.com/Romasmi/s-shop-microservices/user-service/internal/transport/gw"
+	api "github.com/Romasmi/s-shop/gen/go/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

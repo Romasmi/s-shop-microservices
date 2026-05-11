@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	api "github.com/Romasmi/s-shop-microservices/user-service/internal/api"
 	"github.com/Romasmi/s-shop-microservices/user-service/internal/domain/user"
+	api "github.com/Romasmi/s-shop/gen/go/user"
 	"github.com/google/uuid"
 	"github.com/segmentio/kafka-go"
 	"google.golang.org/protobuf/encoding/protojson"

@@ -1,9 +1,6 @@
 .PHONY: generate build run-api run-worker run-cli compose-up compose-down migrate-up migrate-down
 
-BUF_VERSION := v1.45.0
 
-generate:
-	go run github.com/bufbuild/buf/cmd/buf@$(BUF_VERSION) generate
 
 build:
 	go build -o bin/api cmd/api/main.go

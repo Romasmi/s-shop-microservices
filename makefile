@@ -1,7 +1,11 @@
-.PHONY: up build deploy restart install-traefik install-db install-kafka install-grafana hosts run wait-db wait-kafka wait-api clean redeploy status help prometheus-run grafana-run forward-kafka forward-db forward-traefik
+.PHONY: up build deploy restart install-traefik install-db install-kafka install-grafana hosts run wait-db wait-kafka wait-api clean redeploy status help prometheus-run grafana-run forward-kafka forward-db forward-traefik proto-gen
 
 # Main target to start everything from scratch
-up: build deploy wait-db wait-kafka wait-api
+up: proto-gen build deploy wait-db wait-kafka wait-api
+
+# Proto generation
+proto-gen:
+	$(MAKE) -C ./api generate
 
 # Build Docker images and load them into minikube
 build:

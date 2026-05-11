@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"github.com/Romasmi/s-shop-microservices/order-service/internal/usecase"
-	api "github.com/Romasmi/s-shop-microservices/order-service/pkg/api"
+	api "github.com/Romasmi/s-shop/gen/go/order"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

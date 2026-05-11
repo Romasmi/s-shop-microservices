@@ -1,7 +1,4 @@
-BUF_VERSION := v1.45.0
 
-generate:
-	go run github.com/bufbuild/buf/cmd/buf@$(BUF_VERSION) generate
 
 docker-build:
 	docker build --platform linux/amd64 -t romasmi/user-service:latest -f Dockerfile .
