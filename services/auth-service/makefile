@@ -13,3 +13,6 @@ kube-restart:
 
 kube-status:
 	kubectl rollout status deployment/auth-service -n s-shop-system
+
+kube-logs:
+	kubectl logs deployment/auth-service -n s-shop-system
