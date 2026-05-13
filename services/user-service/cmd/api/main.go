@@ -10,8 +10,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Romasmi/s-shop-microservices/internal/app"
-	"github.com/Romasmi/s-shop-microservices/internal/infra/database"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/app"
+	"github.com/Romasmi/s-shop-microservices/user-service/internal/infra/database"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"

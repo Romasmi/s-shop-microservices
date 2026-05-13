@@ -1,19 +1,38 @@
-.PHONY: up build deploy restart install-traefik install-db install-grafana apply hosts run wait-db wait-api clean redeploy status help prometheus-run grafana-run
+.PHONY: up build deploy restart install-traefik install-db install-kafka install-grafana hosts run wait-db wait-kafka wait-api clean redeploy status help prometheus-run grafana-run forward-kafka forward-db forward-traefik proto-gen
 
 # Main target to start everything from scratch
-up: build deploy wait-api
+up: proto-gen build deploy wait-db wait-kafka wait-api
+
+# Proto generation
+proto-gen:
+	$(MAKE) -C ./api generate
 
 # Build Docker images and load them into minikube
 build:
-	$(MAKE) -C ./services/user-service docker-build
-	$(MAKE) -C ./services/auth-service docker-build
+	$(MAKE) -j5 -C ./services/user-service docker-build & \
+	$(MAKE) -j5 -C ./services/auth-service docker-build & \
+	$(MAKE) -j5 -C ./services/notification-service docker-build & \
+	$(MAKE) -j5 -C ./services/order-service docker-build & \
+	$(MAKE) -j5 -C ./services/billing-service docker-build & \
+	wait
 
 docker-push:
-	$(MAKE) -C ./services/user-service docker-push
-	$(MAKE) -C ./services/auth-service docker-push
+	$(MAKE) -j5 -C ./services/user-service docker-push & \
+	$(MAKE) -j5 -C ./services/auth-service docker-push & \
+	$(MAKE) -j5 -C ./services/notification-service docker-push & \
+	$(MAKE) -j5 -C ./services/order-service docker-push & \
+	$(MAKE) -j5 -C ./services/billing-service docker-push & \
+	wait
 
-apply:
-	kubectl apply -f ./deployment/k8s/
+deploy: install-traefik install-db install-kafka install-prometheus install-grafana install-app
+
+install-app:
+	helm upgrade --install s-shop-system ./deployment/helm/s-shop-system \
+		--namespace s-shop-system \
+		--create-namespace
+
+uninstall-app:
+	helm uninstall s-shop-system -n s-shop-system --ignore-not-found
 
 # Helm installations
 install-traefik:
@@ -43,6 +62,16 @@ db-connect:
 forward-db:
 	kubectl port-forward svc/postgresql 5432:5432 -n s-shop-system
 
+install-kafka:
+	helm repo add redpanda https://charts.redpanda.com
+	helm repo update redpanda
+	helm upgrade --install redpanda redpanda/redpanda \
+		--namespace s-shop-system \
+		--create-namespace \
+		--values deployment/helm/redpanda-values.yaml
+
+forward-kafka:
+	kubectl port-forward svc/kafka 9092:9092 -n s-shop-system
 
 install-prometheus:
 	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -76,20 +105,35 @@ wait-db:
 	@echo "Waiting for PostgreSQL to be ready..."
 	kubectl wait --namespace s-shop-system --for=condition=ready pod -l app.kubernetes.io/name=postgresql --timeout=120s
 
+wait-kafka:
+	@echo "Waiting for Redpanda to be ready..."
+	kubectl wait --namespace s-shop-system --for=condition=ready pod -l app.kubernetes.io/name=redpanda --timeout=300s
+
 wait-api:
 	@echo "Waiting for API deployments to be ready..."
 	kubectl rollout status deployment/user-service -n s-shop-system --timeout=120s
 	kubectl rollout status deployment/auth-service -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/notification-service-api -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/notification-service-worker -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/order-service -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/billing-service-api -n s-shop-system --timeout=120s
+	kubectl rollout status deployment/billing-service-worker -n s-shop-system --timeout=120s
 
 restart:
 	kubectl rollout restart deployment/user-service -n s-shop-system
 	kubectl rollout restart deployment/auth-service -n s-shop-system
+	kubectl rollout restart deployment/notification-service-api -n s-shop-system
+	kubectl rollout restart deployment/notification-service-worker -n s-shop-system
+	kubectl rollout restart deployment/order-service -n s-shop-system
+	kubectl rollout restart deployment/billing-service-api -n s-shop-system
+	kubectl rollout restart deployment/billing-service-worker -n s-shop-system
 	$(MAKE) wait-api
 
 clean:
-	kubectl delete -f ./deployment/k8s --ignore-not-found=true
+	helm uninstall s-shop-system -n s-shop-system --ignore-not-found
 	helm uninstall traefik -n traefik --ignore-not-found
 	helm uninstall postgresql -n s-shop-system --ignore-not-found
+	helm uninstall redpanda -n s-shop-system --ignore-not-found
 	helm uninstall prometheus -n s-shop-system --ignore-not-found
 	helm uninstall grafana -n s-shop-system --ignore-not-found
 	kubectl delete namespace traefik --ignore-not-found=true
@@ -97,11 +141,18 @@ clean:
 
 status:
 	@echo "\n--- Infrastructure ---"
+	@echo "Traefik:"
 	@kubectl get pods -n traefik
+	@echo "PostgreSQL:"
 	@kubectl get pods -n s-shop-system -l app.kubernetes.io/name=postgresql
+	@echo "Redpanda:"
+	@kubectl get pods -n s-shop-system -l app.kubernetes.io/name=redpanda
 	@echo "\n--- Application ---"
 	@kubectl get pods -n s-shop-system -l app=user-service
 	@kubectl get pods -n s-shop-system -l app=auth-service
+	@kubectl get pods -n s-shop-system -l app=notification-service
+	@kubectl get pods -n s-shop-system -l app=order-service
+	@kubectl get pods -n s-shop-system -l app=billing-service
 	@echo "\n--- Services ---"
 	@kubectl get svc -n s-shop-system
 	@kubectl get svc -n traefik
@@ -117,12 +168,18 @@ grafana-run:
 grafana-pass:
 	@kubectl get secret grafana -o jsonpath="{.data.admin-password}" -n s-shop-system | base64 --decode ; echo ""
 
+redeploy: build docker-push restart
+
 help:
 	@echo "Usage:"
 	@echo "  make up          - Build images and deploy everything (from scratch)"
+	@echo "  make redeploy    - Build, push and restart all services"
 	@echo "  make run         - Start minikube tunnel (required for access)"
 	@echo "  make status      - Check deployment status"
 	@echo "  make clean       - Remove all resources"
+	@echo "  make install-app - Install application using Helm"
+	@echo "  make forward-kafka - Port-forward Kafka to localhost:9092"
+	@echo "  make forward-db    - Port-forward PostgreSQL to localhost:5432"
 	@echo ""
 	@echo "Quick Start:"
 	@echo "  1. make up"
@@ -131,4 +188,7 @@ help:
 	@echo "  4. Access Dashboard: http://arch.homework:8080/dashboard/"
 
 draw-puml:
-	plantuml -tsvg ./docs/auth/*.puml
+	plantuml -tsvg ./docs/puml/*.puml
+
+test-postman:
+	newman run docs/postman.json --verbose

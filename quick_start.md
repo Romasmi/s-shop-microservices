@@ -3,6 +3,7 @@
 make install-grafana 
 make install-prometheus
 make install-db
+make install-kafka
 make forward-db # to connect to db via local client
 ```
 
