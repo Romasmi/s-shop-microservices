@@ -2,7 +2,9 @@ package notification
 
 import (
 	"context"
+
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/domain/message"
+	"github.com/google/uuid"
 )
 
 type ListMessagesUseCase struct {
@@ -13,6 +15,6 @@ func NewListMessagesUseCase(repo Repository) *ListMessagesUseCase {
 	return &ListMessagesUseCase{repo: repo}
 }
 
-func (uc *ListMessagesUseCase) Do(ctx context.Context, userID string) ([]*message.Message, error) {
+func (uc *ListMessagesUseCase) Do(ctx context.Context, userID uuid.UUID) ([]*message.Message, error) {
 	return uc.repo.ListMessages(ctx, userID)
 }

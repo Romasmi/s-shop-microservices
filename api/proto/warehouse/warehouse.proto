@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package warehouse;
+
+option go_package = "github.com/Romasmi/s-shop/gen/go/warehouse;warehouse";
+
+import "google/api/annotations.proto";
+
+service WarehouseService {
+  rpc AddProduct(AddProductRequest) returns (Product) {
+    option (google.api.http) = {
+      post: "/warehouse/products"
+      body: "*"
+    };
+  }
+  rpc ReserveProduct(ReserveProductRequest) returns (ReserveProductResponse) {
+    option (google.api.http) = {
+      post: "/warehouse/reserve"
+      body: "*"
+    };
+  }
+  rpc ReleaseProduct(ReleaseProductRequest) returns (ReleaseProductResponse) {
+    option (google.api.http) = {
+      post: "/warehouse/release"
+      body: "*"
+    };
+  }
+  rpc CancelReservation(CancelReservationRequest) returns (CancelReservationResponse) {
+    option (google.api.http) = {
+      post: "/warehouse/cancel"
+      body: "*"
+    };
+  }
+}
+
+message Product {
+  string product_id = 1;
+  int32 count = 2;
+}
+
+message AddProductRequest {
+  string product_id = 1;
+  int32 count = 2;
+}
+
+message ReserveProductRequest {
+  string product_id = 1;
+  int32 count = 2;
+}
+
+message ReserveProductResponse {
+  bool success = 1;
+  string reservation_id = 2;
+  string error = 3;
+}
+
+message ReleaseProductRequest {
+  string product_id = 1;
+  string reservation_id = 2;
+}
+
+message ReleaseProductResponse {
+  bool success = 1;
+  string error = 2;
+}
+
+message CancelReservationRequest {
+  string reservation_id = 1;
+}
+
+message CancelReservationResponse {
+  bool success = 1;
+  string error = 2;
+}

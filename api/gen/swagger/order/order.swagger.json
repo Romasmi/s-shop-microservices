@@ -107,6 +107,13 @@
         "price": {
           "type": "string",
           "format": "int64"
+        },
+        "productId": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

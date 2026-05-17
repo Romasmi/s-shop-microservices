@@ -6,6 +6,7 @@ import (
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/domain/message"
 	"github.com/Romasmi/s-shop-microservices/notification-service/internal/usecase"
 	api "github.com/Romasmi/s-shop/gen/go/notification"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -24,8 +25,13 @@ func NewNotificationHandler(app interface {
 }
 
 func (h *NotificationHandler) ListMessages(ctx context.Context, req *api.ListMessagesRequest) (*api.ListMessagesResponse, error) {
+	userID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid user_id: %v", err)
+	}
+
 	handler := h.app.GetHandler(usecase.UseCaseListMessages)
-	resp, err := handler.Do(ctx, req.UserId)
+	resp, err := handler.Do(ctx, userID)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list messages: %v", err)
 	}
@@ -34,9 +40,9 @@ func (h *NotificationHandler) ListMessages(ctx context.Context, req *api.ListMes
 	var apiMsgs []*api.Message
 	for _, m := range msgs {
 		apiMsgs = append(apiMsgs, &api.Message{
-			Id:        m.ID,
-			UserId:    m.UserID,
-			OrderId:   m.OrderID,
+			Id:        m.ID.String(),
+			UserId:    m.UserID.String(),
+			OrderId:   m.OrderID.String(),
 			Type:      m.Type,
 			Timestamp: m.CreatedAt.String(),
 		})

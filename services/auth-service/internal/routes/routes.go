@@ -33,7 +33,7 @@ func RegisterRoutes(
 	router.Handle("/metrics", promhttp.Handler()).Methods(http.MethodGet)
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		http_utils.SuccessJsonResponse(w, map[string]string{"status": "OK"})
-	}).Methods(http.MethodGet)
+	}).Methods(http.MethodGet, http.MethodHead)
 
 	RegisterAuthRoutes(router, app.GetDB().DB, app.GetConfig())
 }

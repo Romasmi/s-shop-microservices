@@ -8,13 +8,14 @@ import (
 	"github.com/Romasmi/s-shop-microservices/auth-service/internal/domain/auth"
 	"github.com/Romasmi/s-shop-microservices/auth-service/internal/repository"
 	"github.com/Romasmi/s-shop-microservices/auth-service/internal/utils/time_utils"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService interface {
 	Login(ctx context.Context, login, password, ip string) (string, error)
 	Validate(ctx context.Context, token string) (*JWTClaims, error)
-	Register(ctx context.Context, userID, login, password string) error
+	Register(ctx context.Context, userID uuid.UUID, login, password string) error
 }
 
 type authService struct {
@@ -49,7 +50,7 @@ func (s *authService) Login(ctx context.Context, login, password, ip string) (st
 	}
 
 	token, err := GenerateToken(
-		a.UserID,
+		a.UserID.String(),
 		a.Login,
 		s.cfg.Jwt.Secret,
 		time_utils.MinutesToDuration(s.cfg.Jwt.Expiration),
@@ -72,7 +73,7 @@ func (s *authService) Validate(ctx context.Context, token string) (*JWTClaims, e
 	return ValidateToken(token, s.cfg.Jwt.Secret)
 }
 
-func (s *authService) Register(ctx context.Context, userID, login, password string) error {
+func (s *authService) Register(ctx context.Context, userID uuid.UUID, login, password string) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err

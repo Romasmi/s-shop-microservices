@@ -37,6 +37,7 @@ func (a *Api) Run() error {
 		http.MethodPut,
 		http.MethodDelete,
 		http.MethodOptions,
+		http.MethodHead,
 	})
 	headers := handlers.AllowedHeaders([]string{
 		"Content-Type",

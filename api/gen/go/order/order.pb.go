@@ -94,6 +94,8 @@ type PlaceOrderRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Price         int64                  `protobuf:"varint,2,opt,name=price,proto3" json:"price,omitempty"`
+	ProductId     string                 `protobuf:"bytes,3,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
+	Count         int32                  `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -138,6 +140,20 @@ func (x *PlaceOrderRequest) GetUserId() string {
 func (x *PlaceOrderRequest) GetPrice() int64 {
 	if x != nil {
 		return x.Price
+	}
+	return 0
+}
+
+func (x *PlaceOrderRequest) GetProductId() string {
+	if x != nil {
+		return x.ProductId
+	}
+	return ""
+}
+
+func (x *PlaceOrderRequest) GetCount() int32 {
+	if x != nil {
+		return x.Count
 	}
 	return 0
 }
@@ -195,10 +211,13 @@ const file_order_order_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05price\x18\x03 \x01(\x03R\x05price\x12\x16\n" +
-	"\x06status\x18\x04 \x01(\tR\x06status\"B\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\"w\n" +
 	"\x11PlaceOrderRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
-	"\x05price\x18\x02 \x01(\x03R\x05price\"!\n" +
+	"\x05price\x18\x02 \x01(\x03R\x05price\x12\x1d\n" +
+	"\n" +
+	"product_id\x18\x03 \x01(\tR\tproductId\x12\x14\n" +
+	"\x05count\x18\x04 \x01(\x05R\x05count\"!\n" +
 	"\x0fGetOrderRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id2\x9e\x01\n" +
 	"\fOrderService\x12G\n" +

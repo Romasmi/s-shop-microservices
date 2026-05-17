@@ -122,3 +122,21 @@ spec:
       services:
         - name: notification-service
           port: 8000
+
+    - kind: Rule
+      match: PathPrefix("/warehouse")
+      priority: 200
+      middlewares:
+        - name: user-auth
+      services:
+        - name: warehouse-service
+          port: 8000
+
+    - kind: Rule
+      match: PathPrefix("/delivery")
+      priority: 200
+      middlewares:
+        - name: user-auth
+      services:
+        - name: delivery-service
+          port: 8000
